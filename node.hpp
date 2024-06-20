@@ -6,6 +6,7 @@
 #define NODE_HPP
 
 #include <vector>
+#include "complex"
 using namespace std;
 
 template<typename T>
