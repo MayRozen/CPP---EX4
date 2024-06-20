@@ -6,7 +6,6 @@
 #include <stack>
 #include <iostream>
 #include "complex"
-#include "node.hpp"
 #include "tree.hpp"
 
 using namespace std;
@@ -77,11 +76,11 @@ class Tree {
         }
     };
 
-    PreOrderIterator begin_pre_order() {
+    PreOrderIterator begin_pre_order() const{
         return PreOrderIterator(root);
     }
 
-    PreOrderIterator end_pre_order() {
+    PreOrderIterator end_pre_order() const{
         return PreOrderIterator(nullptr);
     }
 
@@ -130,11 +129,11 @@ class Tree {
         }
     };
 
-    PostOrderIterator begin_post_order() {
+    PostOrderIterator begin_post_order() const{
         return PostOrderIterator(root);
     }
 
-    PostOrderIterator end_post_order() {
+    PostOrderIterator end_post_order() const{
         return PostOrderIterator(nullptr);
     }
 
@@ -182,11 +181,11 @@ class Tree {
         }
     };
 
-    InOrderIterator begin_in_order() {
+    InOrderIterator begin_in_order() const{
         return InOrderIterator(root);
     }
 
-    InOrderIterator end_in_order() {
+    InOrderIterator end_in_order() const{
         return InOrderIterator(nullptr);
     }
 
@@ -223,11 +222,11 @@ class Tree {
         }
     };
 
-    BFSIterator begin_bfs_scan() {
+    BFSIterator begin_bfs_scan() const{
         return BFSIterator(root);
     }
 
-    BFSIterator end_bfs_scan() {
+    BFSIterator end_bfs_scan() const{
         return BFSIterator(nullptr);
     }
 
@@ -264,11 +263,11 @@ class Tree {
         }
     };
 
-    DFSIterator begin_dfs_scan() {
+    DFSIterator begin_dfs_scan() const{
         return DFSIterator(root);
     }
 
-    DFSIterator end_dfs_scan() {
+    DFSIterator end_dfs_scan() const{
         return DFSIterator(nullptr);
     }
 
@@ -338,13 +337,11 @@ class Tree {
         }
     };
 
-    HeapIterator begin_heap() {
+    HeapIterator begin_heap() const{
         return HeapIterator(root);
     }
 
-    HeapIterator end_heap() {
+    HeapIterator end_heap() const{
         return HeapIterator(nullptr);
     }
 };
-
-
