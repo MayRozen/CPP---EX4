@@ -46,26 +46,32 @@ public:
     void add_root(Node<T>& node); // Adding a new root
     void add_sub_node(Node<T>& parent, Node<T>& child); // Adding a new node
 
-    Node<T> begin_pre_order() const;
-    Node<T> end_pre_order() const;
+    class PreOrderIterator;
+    PreOrderIterator begin_pre_order() const;
+    PreOrderIterator end_pre_order() const;
 
-    Node<T> begin_post_order() const;
-    Node<T> end_post_order() const;
+    class PostOrderIterator;
+    PostOrderIterator begin_post_order() const;
+    PostOrderIterator end_post_order() const;
 
-    Node<T> begin_in_order() const;
-    Node<T> end_in_order() const;
+    class InOrderIterator;
+    InOrderIterator begin_in_order() const;
+    InOrderIterator end_in_order() const;
 
-    Node<T> begin_bfs_scan() const;
-    Node<T> end_bfs_scan() const;
+    class BFSIterator;
+    BFSIterator begin_bfs_scan() const;
+    BFSIterator end_bfs_scan() const;
 
-    Node<T> begin_dfs_scan() const;
-    Node<T> end_dfs_scan() const;
+    class DFSIterator;
+    DFSIterator begin_dfs_scan() const;
+    DFSIterator end_dfs_scan() const;
 
-    // HeapIterator begin_heap();
-    // HeapIterator end_heap();
+    class HeapIterator;
+    HeapIterator begin_heap() const;
+    HeapIterator end_heap() const;
 
     // Overload the output stream operator to print the tree
-    friend ostream& operator<<(ostream& os, const Tree<T, K>& tree);
+    ostream& operator<<(ostream& os);
 };
 
 
