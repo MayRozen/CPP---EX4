@@ -15,11 +15,11 @@ template<typename T, size_t K = 2> // Define the amount of children to be 2 as a
 class Tree {
 
     void Tree::add_root(Node<T>& node) {
-        root = &node; // The root will point of the new node
+        this->root = &node; // The root will point of the new node
     }
 
     void Tree::add_sub_node(Node<T>& parent, Node<T>& child) {
-        if (parent.children.size() < K) { // If we have a "place" for the new kid
+        if (parent.children.size() <= getK()) { // If we have a "place" for the new kid
             parent.add_child(&child);
         } else {
             throw runtime_error("Maximum number of children reached");
@@ -50,8 +50,9 @@ class Tree {
 
     public:
         PreOrderIterator(Node<T>* root) {
-            if (root)
+            if (root) {
                 stack.push(root);
+            }
         }
 
         Node<T>& operator*() const {
@@ -77,7 +78,7 @@ class Tree {
     };
 
     PreOrderIterator begin_pre_order() const{
-        return PreOrderIterator(root);
+        return PreOrderIterator(this->root);
     }
 
     PreOrderIterator end_pre_order() const{
@@ -91,8 +92,9 @@ class Tree {
 
     public:
         PostOrderIterator(Node<T>* root) {
-            if (root)
+            if (this->root) {
                 stack.push({ root, false });
+            }
             advance();
         }
 
@@ -121,16 +123,17 @@ class Tree {
                 stack.push({ current, true });
 
                 // Push children in reverse order (right to left) to simulate post-order traversal
-                for (int i = K - 1; i >= 0; --i) {
-                    if (current->children[i])
+                for (int i = getK() - 1; i >= 0; --i) {
+                    if (current->children[i]) {
                         stack.push({ current->children[i], false });
+                    }
                 }
             }
         }
     };
 
     PostOrderIterator begin_post_order() const{
-        return PostOrderIterator(root);
+        return PostOrderIterator(this->root);
     }
 
     PostOrderIterator end_post_order() const{
@@ -144,8 +147,9 @@ class Tree {
 
     public:
         InOrderIterator(Node<T>* root) {
-            if (root)
-                stack.push(root);
+            if (this->root) {
+                stack.push(this->root);
+            }
             advance();
         }
 
@@ -170,19 +174,21 @@ class Tree {
                 stack.pop();
 
                 // Push children in reverse order (right to left) to simulate in-order traversal
-                for (int i = K - 1; i >= 0; --i) {
-                    if (current->children[i])
+                for (int i = getK() - 1; i >= 0; --i) {
+                    if (current->children[i]) {
                         stack.push(current->children[i]);
+                    }
                 }
 
-                if (!stack.empty())
+                if (!stack.empty()) {
                     break;
+                }
             }
         }
     };
 
     InOrderIterator begin_in_order() const{
-        return InOrderIterator(root);
+        return InOrderIterator(this->root);
     }
 
     InOrderIterator end_in_order() const{
@@ -196,8 +202,9 @@ class Tree {
 
     public:
         BFSIterator(Node<T>* root) {
-            if (root)
-                queue.push(root);
+            if (this->root) {
+                queue.push(this->root);
+            }
         }
 
         Node<T>& operator*() const {
@@ -209,9 +216,10 @@ class Tree {
             queue.pop();
 
             // Enqueue children in order (left to right) for BFS traversal
-            for (size_t i = 0; i < K; ++i) {
-                if (current->children[i])
+            for (size_t i = 0; i < getK(); ++i) {
+                if (current->children[i]) {
                     queue.push(current->children[i]);
+                }
             }
 
             return *this;
@@ -223,7 +231,7 @@ class Tree {
     };
 
     BFSIterator begin_bfs_scan() const{
-        return BFSIterator(root);
+        return BFSIterator(this->root);
     }
 
     BFSIterator end_bfs_scan() const{
@@ -237,8 +245,9 @@ class Tree {
 
     public:
         DFSIterator(Node<T>* root) {
-            if (root)
-                stack.push(root);
+            if (this->root) {
+                stack.push(this->root);
+            }
         }
 
         Node<T>& operator*() const {
@@ -250,7 +259,7 @@ class Tree {
             stack.pop();
 
             // Push children in reverse order (right to left) for DFS traversal
-            for (int i = K - 1; i >= 0; --i) {
+            for (int i = getK() - 1; i >= 0; --i) {
                 if (current->children[i])
                     stack.push(current->children[i]);
             }
@@ -264,7 +273,7 @@ class Tree {
     };
 
     DFSIterator begin_dfs_scan() const{
-        return DFSIterator(root);
+        return DFSIterator(this->root);
     }
 
     DFSIterator end_dfs_scan() const{
@@ -304,8 +313,8 @@ class Tree {
 
     public:
         HeapIterator(Node<T>* root) {
-            if (root) {
-                fillVector(root);
+            if (this->root && getK()==2) {
+                fillVector(this->root);
                 heapify();
             }
         }
@@ -338,7 +347,7 @@ class Tree {
     };
 
     HeapIterator begin_heap() const{
-        return HeapIterator(root);
+        return HeapIterator(this->root);
     }
 
     HeapIterator end_heap() const{

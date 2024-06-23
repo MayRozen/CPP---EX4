@@ -5,7 +5,7 @@ CXX = clang++
 CXXFLAGS = -std=c++11 -Werror -Wsign-conversion -g
 VALGRIND_FLAGS = -v --leak-check=full --show-leak-kinds=all --error-exitcode=99
 
-SOURCES = tree.cpp Complex.cpp node.cpp TestCounter.cpp Test.cpp
+SOURCES = node.cpp tree.cpp Complex.cpp TestCounter.cpp Test.cpp
 OBJECTS = $(SOURCES:.cpp=.o)
 
 run: demo test

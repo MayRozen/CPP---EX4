@@ -12,7 +12,7 @@
 
 using namespace std;
 
-template<typename T, size_t K = 2> // Define the amount of children to be 2 as a default
+template<typename T, size_t K = 2>
 class Tree {
     private:
     // Helper function to delete all nodes in the tree recursively
@@ -28,37 +28,47 @@ class Tree {
 
 public:
     Node<T>* root; // The tree is a vector of pointers to the nodes
+    size_t K = (size_t)2; // Define the amount of children to be 2 as a default
 
-    Tree() : root(nullptr) {} // Firsofall, the root will be null
+    // Static assertion to ensure K is between 2 and 5
+    //static_assert(K >= 2 && K <= 5, "K must be between 2 and 5");
+
+    Tree() : root(nullptr), K(){} // Firsofall, the root will be null
 
     // Destructor to delete the entire tree
     ~Tree() {
         deleteTree(root);
+        K = 2;
+    }
+
+    int getK(){
+        return K;
     }
 
     void add_root(Node<T>& node); // Adding a new root
     void add_sub_node(Node<T>& parent, Node<T>& child); // Adding a new node
 
-    Node<T>& begin_pre_order() const;
-    Node<T>& end_pre_order() const;
+    Node<T> begin_pre_order() const;
+    Node<T> end_pre_order() const;
 
-    Node<T>& begin_post_order() const;
-    Node<T>& end_post_order() const;
+    Node<T> begin_post_order() const;
+    Node<T> end_post_order() const;
 
-    Node<T>& begin_in_order() const;
-    Node<T>& end_in_order() const;
+    Node<T> begin_in_order() const;
+    Node<T> end_in_order() const;
 
-    Node<T>& begin_bfs_scan() const;
-    Node<T>& end_bfs_scan() const;
+    Node<T> begin_bfs_scan() const;
+    Node<T> end_bfs_scan() const;
 
-    Node<T>& begin_dfs_scan() const;
-    Node<T>& end_dfs_scan() const;
+    Node<T> begin_dfs_scan() const;
+    Node<T> end_dfs_scan() const;
 
     // HeapIterator begin_heap();
     // HeapIterator end_heap();
 
     // Overload the output stream operator to print the tree
-    friend ostream& operator<<(ostream& os, const Tree<T, K>& tree);
+    friend ostream& operator<<(ostream& os, const Tree<T, getK()>& tree);
 };
+
 
 #endif // TREE_HPP

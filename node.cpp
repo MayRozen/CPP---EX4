@@ -4,15 +4,15 @@
 
 #include <vector>
 #include <stack>
-#include <cstddef> // Include for size_t
 
-template<typename T, size_t K = 2> // Default arity of 2
+// Container - Node
+template<typename T> 
 class Node {
 public:
     T value;
-    std::vector<Node<T>*> children;
+    std::vector<Node<T>*> children; // Vector of pointers to nodes = children
 
-    Node(T val) : value(val) {}
+    Node(T val) : value(val) {} // constructor
 
     ~Node() {
         for (Node<T>* child : children) {
@@ -21,7 +21,7 @@ public:
         children.clear();  // Clear the vector of children
     }
 
-    T get_value() const {
+    T get_value() const { // Generic
         return value;
     }
 
@@ -29,34 +29,32 @@ public:
         children.push_back(child);
     }
 
-    // Example iterator implementation (PreOrderIterator)
-    class PreOrderIterator {
-    private:
-        std::stack<Node<T>*> stack;
+    // != operator for iterator comparison
+    bool operator!=(const Node<T>& other) const {
+        return !(*this == other);
+    }
 
-    public:
-        PreOrderIterator(Node<T>* root) {
-            if (root){
-                stack.push(root);
+    // == operator for iterator comparison
+    bool operator==(const Node<T>& other) const {
+        if (node_stack.empty() && other.node_stack.empty()) {
+            return true;
+        }
+        if (!node_stack.empty() && !other.node_stack.empty()) {
+            return node_stack.top() == other.node_stack.top();
+        }
+        return false;
+    }
+
+    // Prefix increment operator
+    Node<T>& operator++() {
+        if (!node_stack.empty()) {
+            Node<T>* current = node_stack.top();
+            node_stack.pop();
+            for (auto it = current->children.rbegin(); it != current->children.rend(); ++it) {
+                node_stack.push(*it);
             }
         }
-
-        Node<T>& operator*() const {
-            return *stack.top();
-        }
-
-        PreOrderIterator& operator++() {
-            Node<T>* current = stack.top();
-            stack.pop();
-            for (int i = current->children.size() - 1; i >= 0; --i) {
-                stack.push(current->children[i]);
-            }
-            return *this;
-        }
-
-        bool operator!=(const PreOrderIterator& other) const {
-            return stack.size() != other.stack.size() || (stack.size() > 0 && stack.top() != other.stack.top());
-        }
-    };
+        return *this;
+    }
 };
 
