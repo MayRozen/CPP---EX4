@@ -10,15 +10,13 @@
 
 using namespace std;
 
-template<typename T, size_t K = 2> // Define the amount of children to be 2 as a default
-
-class Tree {
-
-    void Tree::add_root(Node<T>& node) {
+    template<typename T, int K>
+    void Tree<T, K>::add_root(Node<T>& node) {
         this->root = &node; // The root will point of the new node
     }
 
-    void Tree::add_sub_node(Node<T>& parent, Node<T>& child) {
+    template<typename T, int K>
+    void Tree<T, K>::add_sub_node(Node<T>& parent, Node<T>& child) {
         if (parent.children.size() <= getK()) { // If we have a "place" for the new kid
             parent.add_child(&child);
         } else {
@@ -28,7 +26,9 @@ class Tree {
 
     
     // Overload the output stream operator to print the tree
-    friend ostream& operator<<(ostream& os, const Tree<T, K>& tree) {
+    // Definition of operator<< for Tree class
+    template<typename T, int K>
+    ostream& operator<<(ostream& os, const Tree<T, int K) {
         if (tree.root == nullptr) return os;
         queue<Node<T>*> q;
         q.push(tree.root);
@@ -44,7 +44,8 @@ class Tree {
     }
 
     // Iterator methods
-    class PreOrderIterator {
+    template<typename T, int K>
+    class PreOrderIterator{
     private:
         stack<Node<T>*> stack;
 
@@ -77,15 +78,18 @@ class Tree {
         }
     };
 
-    PreOrderIterator begin_pre_order() const{
+    template<typename T, int K>
+    PreOrderIterator Tree<T, K>::begin_pre_order() const{
         return PreOrderIterator(this->root);
     }
 
-    PreOrderIterator end_pre_order() const{
+    template<typename T, int K>
+    PreOrderIterator Tree<T, K>::end_pre_order() const{
         return PreOrderIterator(nullptr);
     }
 
     // Post-order iterator
+    template<typename T, int K>
     class PostOrderIterator {
     private:
         stack<pair<Node<T>*, bool>> stack;
@@ -132,15 +136,18 @@ class Tree {
         }
     };
 
-    PostOrderIterator begin_post_order() const{
+    template<typename T, int K>
+    PostOrderIterator Tree<T, K>::begin_post_order() const{
         return PostOrderIterator(this->root);
     }
 
-    PostOrderIterator end_post_order() const{
+    template<typename T, int K>
+    PostOrderIterator Tree<T, K>::end_post_order() const{
         return PostOrderIterator(nullptr);
     }
 
     // In-order iterator (not applicable for k-ary trees, simulate using DFS)
+    template<typename T, int K>
     class InOrderIterator {
     private:
         stack<Node<T>*> stack;
@@ -187,15 +194,18 @@ class Tree {
         }
     };
 
-    InOrderIterator begin_in_order() const{
+    template<typename T, int K>
+    InOrderIterator Tree<T, K>::begin_in_order() const{
         return InOrderIterator(this->root);
     }
 
-    InOrderIterator end_in_order() const{
+    template<typename T, int K>
+    InOrderIterator Tree<T, K>::end_in_order() const{
         return InOrderIterator(nullptr);
     }
 
     // BFS iterator
+    template<typename T, int K>
     class BFSIterator {
     private:
         queue<Node<T>*> queue;
@@ -216,7 +226,7 @@ class Tree {
             queue.pop();
 
             // Enqueue children in order (left to right) for BFS traversal
-            for (size_t i = 0; i < getK(); ++i) {
+            for (size_t i = 0; i < (size_t)getK(); ++i) {
                 if (current->children[i]) {
                     queue.push(current->children[i]);
                 }
@@ -230,15 +240,18 @@ class Tree {
         }
     };
 
-    BFSIterator begin_bfs_scan() const{
+    template<typename T, int K>
+    BFSIterator Tree<T, K>::begin_bfs_scan() const{
         return BFSIterator(this->root);
     }
 
-    BFSIterator end_bfs_scan() const{
+    template<typename T, int K>
+    BFSIterator  Tree<T, K>::end_bfs_scan() const{
         return BFSIterator(nullptr);
     }
 
     // DFS iterator (using recursive approach)
+    template<typename T, int K>
     class DFSIterator {
     private:
         stack<Node<T>*> stack;
@@ -272,15 +285,18 @@ class Tree {
         }
     };
 
-    DFSIterator begin_dfs_scan() const{
+    template<typename T, int K>
+    DFSIterator  Tree<T, K>::begin_dfs_scan() const{
         return DFSIterator(this->root);
     }
 
-    DFSIterator end_dfs_scan() const{
+    template<typename T, int K>
+    DFSIterator  Tree<T, K>::end_dfs_scan() const{
         return DFSIterator(nullptr);
     }
 
      // Heap iterator
+     template<typename T, int K>
     class HeapIterator {
     private:
         vector<Node<T>*> heap;
@@ -340,17 +356,18 @@ class Tree {
         void fillVector(Node<T>* node) {
             if (!node) return;
             heap.push_back(node);
-            for (size_t i = 0; i < K; ++i) {
+            for (size_t i = 0; i < (size_t)K; ++i) {
                 fillVector(node->children[i]);
             }
         }
     };
 
-    HeapIterator begin_heap() const{
+    template<typename T, int K>
+    HeapIterator  Tree<T, K>::begin_heap() const{
         return HeapIterator(this->root);
     }
 
-    HeapIterator end_heap() const{
+    template<typename T, int K>
+    HeapIterator  Tree<T, K>::end_heap() const{
         return HeapIterator(nullptr);
     }
-};

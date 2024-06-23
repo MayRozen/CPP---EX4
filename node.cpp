@@ -11,6 +11,7 @@ class Node {
 public:
     T value;
     std::vector<Node<T>*> children; // Vector of pointers to nodes = children
+    std::stack<Node<T>*> node_stack; // Stack to store nodes for iterator
 
     Node(T val) : value(val) {} // constructor
 

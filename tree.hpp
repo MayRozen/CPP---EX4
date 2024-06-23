@@ -12,7 +12,7 @@
 
 using namespace std;
 
-template<typename T, size_t K = 2>
+template<typename T, int K = 2>
 class Tree {
     private:
     // Helper function to delete all nodes in the tree recursively
@@ -28,17 +28,15 @@ class Tree {
 
 public:
     Node<T>* root; // The tree is a vector of pointers to the nodes
-    size_t K = (size_t)2; // Define the amount of children to be 2 as a default
 
     // Static assertion to ensure K is between 2 and 5
     //static_assert(K >= 2 && K <= 5, "K must be between 2 and 5");
 
-    Tree() : root(nullptr), K(){} // Firsofall, the root will be null
+    Tree() : root(nullptr) {} // Firsofall, the root will be null
 
     // Destructor to delete the entire tree
     ~Tree() {
         deleteTree(root);
-        K = 2;
     }
 
     int getK(){
@@ -67,7 +65,7 @@ public:
     // HeapIterator end_heap();
 
     // Overload the output stream operator to print the tree
-    friend ostream& operator<<(ostream& os, const Tree<T, getK()>& tree);
+    friend ostream& operator<<(ostream& os, const Tree<T, K>& tree);
 };
 
 
