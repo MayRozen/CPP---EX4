@@ -46,32 +46,165 @@ public:
     void add_root(Node<T>& node); // Adding a new root
     void add_sub_node(Node<T>& parent, Node<T>& child); // Adding a new node
 
-    class PreOrderIterator;
+    // Overload the output stream operator to print the tree
+    ostream& operator<<(ostream& os);
+
+    // PreOrderIterator class declaration
+    class PreOrderIterator {
+    private:
+        stack<Node<T>*> stack;
+    public:
+        PreOrderIterator(Node<T>* root);
+        Node<T>* operator->() const;
+        Node<T>& operator*() const;
+        PreOrderIterator& operator++();
+        bool operator!=(const PreOrderIterator& other) const;
+    };
+
     PreOrderIterator begin_pre_order() const;
     PreOrderIterator end_pre_order() const;
 
-    class PostOrderIterator;
+    // PostOrderIterator class declaration
+    class PostOrderIterator {
+    private:
+        stack<pair<Node<T>*, bool>> stack;
+        void advance() {
+        while (!stack.empty() && stack.top().second) {
+            stack.pop();
+        }
+        if (!stack.empty()) {
+            Node<T>* current = stack.top().first;
+            stack.pop();
+            stack.push({ current, true });
+
+            // Push children in reverse order (right to left) to simulate post-order traversal
+            for (int i = this->getK() - 1; i >= 0; --i) {
+                if (current->children[i]) {
+                    stack.push({ current->children[i], false });
+                }
+            }
+        }
+    }
+    public:
+        PostOrderIterator(Node<T>* root);
+        Node<T>* operator->() const;
+        Node<T>& operator*() const;
+        PostOrderIterator& operator++();
+        bool operator!=(const PostOrderIterator& other) const;
+    };
+
     PostOrderIterator begin_post_order() const;
     PostOrderIterator end_post_order() const;
 
-    class InOrderIterator;
+    // InOrderIterator class declaration
+    class InOrderIterator {
+    private:
+        stack<Node<T>*> stack;
+        void advance() {
+        while (!stack.empty()) {
+            Node<T>* current = stack.top();
+            stack.pop();
+
+            // Push children in reverse order (right to left) to simulate in-order traversal
+            for (int i = this->getK() - 1; i >= 0; --i) {
+                if (current->children[i]) {
+                    stack.push(current->children[i]);
+                }
+            }
+
+            if (!stack.empty()) {
+                break;
+            }
+        }
+    }
+    public:
+        InOrderIterator(Node<T>* root);
+        Node<T>* operator->() const;
+        Node<T>& operator*() const;
+        InOrderIterator& operator++();
+        bool operator!=(const InOrderIterator& other) const;
+    };
+
     InOrderIterator begin_in_order() const;
     InOrderIterator end_in_order() const;
 
-    class BFSIterator;
+    // BFSIterator class declaration
+    class BFSIterator {
+    private:
+        queue<Node<T>*> queue;
+    public:
+        BFSIterator(Node<T>* root);
+        Node<T>* operator->() const;
+        Node<T>& operator*() const;
+        BFSIterator& operator++();
+        bool operator!=(const BFSIterator& other) const;
+    };
+
     BFSIterator begin_bfs_scan() const;
     BFSIterator end_bfs_scan() const;
 
-    class DFSIterator;
+    // DFSIterator class declaration
+    class DFSIterator {
+    private:
+        stack<Node<T>*> stack;
+    public:
+        DFSIterator(Node<T>* root);
+        Node<T>* operator->() const;
+        Node<T>& operator*() const;
+        DFSIterator& operator++();
+        bool operator!=(const DFSIterator& other) const;
+    };
+
     DFSIterator begin_dfs_scan() const;
     DFSIterator end_dfs_scan() const;
 
-    class HeapIterator;
+    // HeapIterator class declaration
+    class HeapIterator {
+    private:
+        vector<Node<T>*> heap;
+        void heapify() {
+            int n = heap.size();
+            for (int i = n / 2 - 1; i >= 0; --i) {
+                siftDown(i, n);
+            }
+        }
+        
+        void siftDown(int i, int n) {
+            int smallest = i;
+            int left = 2 * i + 1;
+            int right = 2 * i + 2;
+
+            if (left < n && heap[left]->data < heap[smallest]->data) {
+                smallest = left;
+            }
+
+            if (right < n && heap[right]->data < heap[smallest]->data) {
+                smallest = right;
+            }
+
+            if (smallest != i) {
+                swap(heap[i], heap[smallest]);
+                siftDown(smallest, n);
+            }
+        }
+        
+        void fillVector(Node<T>* node) {
+            if (!node) return;
+            heap.push_back(node);
+            for (size_t i = 0; i < (size_t)K; ++i) {
+                fillVector(node->children[i]);
+            }
+        }
+    public:
+        HeapIterator(Node<T>* root);
+        Node<T>* operator->() const;
+        Node<T>& operator*() const;
+        HeapIterator& operator++();
+        bool operator!=(const HeapIterator& other) const;
+    };
+
     HeapIterator begin_heap() const;
     HeapIterator end_heap() const;
-
-    // Overload the output stream operator to print the tree
-    ostream& operator<<(ostream& os);
 };
 
 

@@ -29,9 +29,9 @@ void Tree<T, K>::add_sub_node(Node<T>& parent, Node<T>& child) {
 // Definition of operator<< for Tree class
 template<typename T, int K>
 ostream& Tree<T ,K>::operator<<(ostream& os) {
-    if (tree.root == nullptr) return os;
+    if (this->root == nullptr) return os;
     queue<Node<T>*> q;
-    q.push(tree.root);
+    q.push(this->root);
     while (!q.empty()) {
         Node<T>* node = q.front();
         q.pop();
@@ -45,317 +45,271 @@ ostream& Tree<T ,K>::operator<<(ostream& os) {
 
 // Iterator methods
 template<typename T, int K>
-class Tree<T, K>::PreOrderIterator{
-private:
-    stack<Node<T>*> stack;
+Tree<T, K>::PreOrderIterator::PreOrderIterator(Node<T>* root) {
+    if (root) {
+        stack.push(root);
+    }
+}
 
-public:
-    PreOrderIterator(Node<T>* root) {
-        if (root) {
-            stack.push(root);
-        }
+template<typename T, int K>
+Node<T>& Tree<T, K>::PreOrderIterator::operator*() const {
+    return *stack.top();
+}
+
+template<typename T, int K>
+typename Tree<T, K>::PreOrderIterator& Tree<T, K>::PreOrderIterator::operator++() {
+    Node<T>* current = stack.top();
+    stack.pop();
+
+    // Push children in reverse order (right to left) to simulate pre-order traversal
+    for (int i = K - 1; i >= 0; --i) {
+        if (current->children[i])
+            stack.push(current->children[i]);
     }
 
-    Node<T>& operator*() const {
-        return *stack.top();
-    }
+    return *this;
+}
 
-    PreOrderIterator& operator++() {
-        Node<T>* current = stack.top();
-        stack.pop();
+template<typename T, int K>
+bool Tree<T, K>::PreOrderIterator::operator!=(const PreOrderIterator& other) const {
+    return stack.size() != other.stack.size() || (stack.size() > 0 && stack.top() != other.stack.top());
+}
 
-        // Push children in reverse order (right to left) to simulate pre-order traversal
-        for (int i = K - 1; i >= 0; --i) {
-            if (current->children[i])
-                stack.push(current->children[i]);
-        }
+// Implementation of PreOrderIterator::operator->()
+template<typename T, int K>
+Node<T>* Tree<T, K>::PreOrderIterator::operator->() const {
+    return stack.top();
+}
 
-        return *this;
-    }
+template<typename T, int K>
+typename Tree<T, K>::PreOrderIterator Tree<T, K>::begin_pre_order() const {
+    return PreOrderIterator(root);
+}
 
-    bool operator!=(const PreOrderIterator& other) const {
-        return stack.size() != other.stack.size() || (stack.size() > 0 && stack.top() != other.stack.top());
-    }
-
-    PreOrderIterator Tree<T, K>::begin_pre_order() const{
-        return PreOrderIterator(this->root);
-    }
-
-    PreOrderIterator Tree<T, K>::end_pre_order() const{
-        return PreOrderIterator(nullptr);
-    }
-};
+template<typename T, int K>
+typename Tree<T, K>::PreOrderIterator Tree<T, K>::end_pre_order() const {
+    return PreOrderIterator(nullptr);
+}
 
 // Post-order iterator
 template<typename T, int K>
-class Tree<T, K>::PostOrderIterator {
-private:
-    stack<pair<Node<T>*, bool>> stack;
-
-public:
-    PostOrderIterator(Node<T>* root) {
-        if (this->root) {
-            stack.push({ root, false });
-        }
-        advance();
+Tree<T, K>::PostOrderIterator::PostOrderIterator(Node<T>* root) {
+    if (this->root) {
+        stack.push({ this->root, false });
     }
+    advance();
+}
 
-    Node<T>& operator*() const {
-        return *stack.top().first;
-    }
+template<typename T, int K>
+Node<T>& Tree<T, K>::PostOrderIterator::operator*() const {
+    return *stack.top().first;
+}
 
-    PostOrderIterator& operator++() {
-        stack.pop();
-        advance();
-        return *this;
-    }
+template<typename T, int K>
+typename Tree<T, K>::PostOrderIterator& Tree<T, K>::PostOrderIterator::operator++() {
+    stack.pop();
+    advance();
+    return *this;
+}
 
-    bool operator!=(const PostOrderIterator& other) const {
-        return stack.size() != other.stack.size() || (stack.size() > 0 && stack.top().first != other.stack.top().first);
-    }
+template<typename T, int K>
+bool Tree<T, K>::PostOrderIterator::operator!=(const PostOrderIterator& other) const {
+    return stack.size() != other.stack.size() || (stack.size() > 0 && stack.top().first != other.stack.top().first);
+}
 
-private:
-    void advance() {
-        while (!stack.empty() && stack.top().second) {
-            stack.pop();
-        }
-        if (!stack.empty()) {
-            Node<T>* current = stack.top().first;
-            stack.pop();
-            stack.push({ current, true });
+template<typename T, int K>
+Node<T>* Tree<T, K>::PostOrderIterator::operator->() const {
+    return stack.top().first;
+}
 
-            // Push children in reverse order (right to left) to simulate post-order traversal
-            for (int i = getK() - 1; i >= 0; --i) {
-                if (current->children[i]) {
-                    stack.push({ current->children[i], false });
-                }
-            }
-        }
-    }
+template<typename T, int K>
+typename Tree<T, K>::PostOrderIterator Tree<T, K>::begin_post_order() const {
+    return PostOrderIterator(root);
+}
 
-    PostOrderIterator Tree<T, K>::begin_post_order() const{
-        return PostOrderIterator(this->root);
-    }
-
-    PostOrderIterator Tree<T, K>::end_post_order() const{
-        return PostOrderIterator(nullptr);
-    }
-};
+template<typename T, int K>
+typename Tree<T, K>::PostOrderIterator Tree<T, K>::end_post_order() const {
+    return PostOrderIterator(nullptr);
+}
 
 // In-order iterator (not applicable for k-ary trees, simulate using DFS)
 template<typename T, int K>
-class Tree<T, K>::InOrderIterator {
-private:
-    stack<Node<T>*> stack;
-
-public:
-    InOrderIterator(Node<T>* root) {
-        if (this->root) {
-            stack.push(this->root);
-        }
-        advance();
+Tree<T, K>::InOrderIterator::InOrderIterator(Node<T>* root) {
+    if (this->root) {
+        stack.push(this->root);
     }
+    advance();
+}
 
-    Node<T>& operator*() const {
-        return *stack.top();
-    }
-
-    InOrderIterator& operator++() {
-        stack.pop();
-        advance();
-        return *this;
-    }
-
-    bool operator!=(const InOrderIterator& other) const {
-        return stack.size() != other.stack.size() || (stack.size() > 0 && stack.top() != other.stack.top());
-    }
-
-private:
-    void advance() {
-        while (!stack.empty()) {
-            Node<T>* current = stack.top();
-            stack.pop();
-
-            // Push children in reverse order (right to left) to simulate in-order traversal
-            for (int i = getK() - 1; i >= 0; --i) {
-                if (current->children[i]) {
-                    stack.push(current->children[i]);
-                }
-            }
-
-            if (!stack.empty()) {
-                break;
-            }
-        }
-    }
-
-    InOrderIterator Tree<T, K>::begin_in_order() const{
-        return InOrderIterator(this->root);
-    }
-
-    InOrderIterator Tree<T, K>::end_in_order() const{
-        return InOrderIterator(nullptr);
-    }
-};
-
-// BFS iterator
 template<typename T, int K>
-class Tree<T, K>::BFSIterator {
-private:
-    queue<Node<T>*> queue;
+Node<T>& Tree<T, K>::InOrderIterator::operator*() const {
+    return *stack.top();
+}
 
-public:
-    BFSIterator(Node<T>* root) {
-        if (this->root) {
-            queue.push(this->root);
+template<typename T, int K>
+typename Tree<T, K>::InOrderIterator& Tree<T, K>::InOrderIterator::operator++() {
+    stack.pop();
+    advance();
+    return *this;
+}
+
+template<typename T, int K>
+bool Tree<T, K>::InOrderIterator::operator!=(const InOrderIterator& other) const {
+    return stack.size() != other.stack.size() || (stack.size() > 0 && stack.top() != other.stack.top());
+}
+
+
+template<typename T, int K>
+Node<T>* Tree<T, K>::InOrderIterator::operator->() const {
+    return stack.top();
+}
+
+template<typename T, int K>
+typename Tree<T, K>::InOrderIterator Tree<T, K>::begin_in_order() const {
+    return InOrderIterator(root);
+}
+
+template<typename T, int K>
+typename Tree<T, K>::InOrderIterator Tree<T, K>::end_in_order() const {
+    return InOrderIterator(nullptr);
+}
+
+// BFS iterator 
+template<typename T, int K>
+Tree<T, K>::BFSIterator::BFSIterator(Node<T>* root) {
+    if (this->root) {
+        queue.push(this->root);
+    }
+}
+
+template<typename T, int K>
+Node<T>&  Tree<T, K>::BFSIterator::operator*() const {
+    return *queue.front();
+}
+
+template<typename T, int K>
+typename Tree<T, K>::BFSIterator&  Tree<T, K>::BFSIterator::operator++() {
+    Node<T>* current = queue.front();
+    queue.pop();
+
+    // Enqueue children in order (left to right) for BFS traversal
+    for (size_t i = 0; i < (size_t)this->getK(); ++i) {
+        if (current->children[i]) {
+            queue.push(current->children[i]);
         }
     }
 
-    Node<T>& operator*() const {
-        return *queue.front();
-    }
+    return *this;
+}
 
-    BFSIterator& operator++() {
-        Node<T>* current = queue.front();
-        queue.pop();
+template<typename T, int K>
+bool Tree<T, K>::BFSIterator::operator!=(const BFSIterator& other) const {
+    return queue.size() != other.queue.size() || (queue.size() > 0 && queue.front() != other.queue.front());
+}
 
-        // Enqueue children in order (left to right) for BFS traversal
-        for (size_t i = 0; i < (size_t)getK(); ++i) {
-            if (current->children[i]) {
-                queue.push(current->children[i]);
-            }
-        }
 
-        return *this;
-    }
+template<typename T, int K>
+Node<T>* Tree<T, K>::BFSIterator::operator->() const {
+    return queue.front();
+}
 
-    bool operator!=(const BFSIterator& other) const {
-        return queue.size() != other.queue.size() || (queue.size() > 0 && queue.front() != other.queue.front());
-    }
+template<typename T, int K>
+typename Tree<T, K>::BFSIterator Tree<T, K>::begin_bfs_scan() const {
+    return BFSIterator(root);
+}
 
-    BFSIterator Tree<T, K>::begin_bfs_scan() const{
-        return BFSIterator(this->root);
-    }
-
-    BFSIterator  Tree<T, K>::end_bfs_scan() const{
-        return BFSIterator(nullptr);
-    }
-};
+template<typename T, int K>
+typename Tree<T, K>::BFSIterator Tree<T, K>::end_bfs_scan() const {
+    return BFSIterator(nullptr);
+}
 
 // DFS iterator (using recursive approach)
 template<typename T, int K>
-class Tree<T, K>::DFSIterator {
-private:
-    stack<Node<T>*> stack;
+Tree<T, K>::DFSIterator::DFSIterator(Node<T>* root) {
+    if (this->root) {
+        stack.push(this->root);
+    }
+}
 
-public:
-    DFSIterator(Node<T>* root) {
-        if (this->root) {
-            stack.push(this->root);
-        }
+template<typename T, int K>
+Node<T>& Tree<T, K>::DFSIterator::operator*() const {
+    return *stack.top();
+}
+
+template<typename T, int K>
+typename Tree<T, K>::DFSIterator& Tree<T, K>::DFSIterator::operator++() {
+    Node<T>* current = stack.top();
+    stack.pop();
+
+    // Push children in reverse order (right to left) for DFS traversal
+    for (int i = this->getK() - 1; i >= 0; --i) {
+        if (current->children[i])
+            stack.push(current->children[i]);
     }
 
-    Node<T>& operator*() const {
-        return *stack.top();
-    }
+    return *this;
+}
 
-    DFSIterator& operator++() {
-        Node<T>* current = stack.top();
-        stack.pop();
-
-        // Push children in reverse order (right to left) for DFS traversal
-        for (int i = getK() - 1; i >= 0; --i) {
-            if (current->children[i])
-                stack.push(current->children[i]);
-        }
-
-        return *this;
-    }
-
-    bool operator!=(const DFSIterator& other) const {
+template<typename T, int K>
+    bool Tree<T, K>::DFSIterator::operator!=(const DFSIterator& other) const {
         return stack.size() != other.stack.size() || (stack.size() > 0 && stack.top() != other.stack.top());
     }
 
-    DFSIterator Tree<T, K>::begin_dfs_scan() const{
-        return DFSIterator(this->root);
-    }
-
-    DFSIterator Tree<T, K>::end_dfs_scan() const{
-        return DFSIterator(nullptr);
-    }
-};
-
-    // Heap iterator
 template<typename T, int K>
-class Tree<T, K>::HeapIterator {
-private:
-    vector<Node<T>*> heap;
+Node<T>* Tree<T, K>::DFSIterator::operator->() const {
+    return stack.top();
+}
 
-    void heapify() {
-        int n = heap.size();
-        for (int i = n / 2 - 1; i >= 0; --i) {
-            siftDown(i, n);
-        }
+template<typename T, int K>
+typename Tree<T, K>::DFSIterator Tree<T, K>::begin_dfs_scan() const {
+    return DFSIterator(root);
+}
+
+template<typename T, int K>
+typename Tree<T, K>::DFSIterator Tree<T, K>::end_dfs_scan() const {
+    return DFSIterator(nullptr);
+}
+
+// Heap iterator
+template<typename T, int K>
+Tree<T, K>::HeapIterator::HeapIterator(Node<T>* root) {
+    if (this->root && this->getK()==2) {
+        fillVector(this->root);
+        heapify();
     }
+}
 
-    void siftDown(int i, int n) {
-        int smallest = i;
-        int left = 2 * i + 1;
-        int right = 2 * i + 2;
+template<typename T, int K>
+Node<T>& Tree<T, K>::HeapIterator::operator*() const {
+    return *heap[0];
+}
 
-        if (left < n && heap[left]->data < heap[smallest]->data) {
-            smallest = left;
-        }
-
-        if (right < n && heap[right]->data < heap[smallest]->data) {
-            smallest = right;
-        }
-
-        if (smallest != i) {
-            swap(heap[i], heap[smallest]);
-            siftDown(smallest, n);
-        }
+template<typename T, int K>
+typename Tree<T, K>::HeapIterator& Tree<T, K>::HeapIterator::operator++() {
+    if (!heap.empty()) {
+        swap(heap[0], heap[heap.size() - 1]);
+        heap.pop_back();
+        siftDown(0, heap.size());
     }
+    return *this;
+}
 
-public:
-    HeapIterator(Node<T>* root) {
-        if (this->root && getK()==2) {
-            fillVector(this->root);
-            heapify();
-        }
-    }
+template<typename T, int K>
+bool Tree<T, K>::HeapIterator::operator!=(const HeapIterator& other) const {
+    return heap.size() != other.heap.size();
+}
 
-    Node<T>& operator*() const {
-        return *heap[0];
-    }
+template<typename T, int K>
+Node<T>* Tree<T, K>::HeapIterator::operator->() const {
+    return heap.front();
+}
 
-    HeapIterator& operator++() {
-        if (!heap.empty()) {
-            swap(heap[0], heap[heap.size() - 1]);
-            heap.pop_back();
-            siftDown(0, heap.size());
-        }
-        return *this;
-    }
+template<typename T, int K>
+typename Tree<T, K>::HeapIterator Tree<T, K>::begin_heap() const {
+    return HeapIterator(root);
+}
 
-    bool operator!=(const HeapIterator& other) const {
-        return heap.size() != other.heap.size();
-    }
-
-    HeapIterator Tree<T, K>::begin_heap() const{
-        return HeapIterator(this->root);
-    }
-
-    HeapIterator Tree<T, K>::end_heap() const{
-        return HeapIterator(nullptr);
-    }
-
-private:
-    void fillVector(Node<T>* node) {
-        if (!node) return;
-        heap.push_back(node);
-        for (size_t i = 0; i < (size_t)K; ++i) {
-            fillVector(node->children[i]);
-        }
-    }
-};
+template<typename T, int K>
+typename Tree<T, K>::HeapIterator Tree<T, K>::end_heap() const {
+    return HeapIterator(nullptr);
+}
