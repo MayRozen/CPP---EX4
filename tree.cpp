@@ -12,7 +12,7 @@ using namespace std;
 
 template<typename T, int K>
 void Tree<T, K>::add_root(Node<T>& node) {
-    this->root = &node; // The root will point of the new node
+    root = &node; // The root will point of the new node
 }
 
 template<typename T, int K>
@@ -95,7 +95,7 @@ typename Tree<T, K>::PreOrderIterator Tree<T, K>::end_pre_order() const {
 template<typename T, int K>
 Tree<T, K>::PostOrderIterator::PostOrderIterator(Node<T>* root) {
     if (this->root) {
-        stack.push({ this->root, false });
+        stack.push({ root, false });
     }
     advance();
 }
