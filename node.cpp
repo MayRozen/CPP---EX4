@@ -11,7 +11,6 @@ class Node {
 public:
     T value;
     std::vector<Node<T>*> children; // Vector of pointers to nodes = children
-    std::stack<Node<T>*> node_stack; // Stack to store nodes for iterator
 
     Node(T val) : value(val) {} // constructor
 
@@ -28,34 +27,6 @@ public:
 
     void add_child(Node<T>* child) {
         children.push_back(child);
-    }
-
-    // != operator for iterator comparison
-    bool operator!=(const Node<T>& other) const {
-        return !(*this == other);
-    }
-
-    // == operator for iterator comparison
-    bool operator==(const Node<T>& other) const {
-        if (node_stack.empty() && other.node_stack.empty()) {
-            return true;
-        }
-        if (!node_stack.empty() && !other.node_stack.empty()) {
-            return node_stack.top() == other.node_stack.top();
-        }
-        return false;
-    }
-
-    // Prefix increment operator
-    Node<T>& operator++() {
-        if (!node_stack.empty()) {
-            Node<T>* current = node_stack.top();
-            node_stack.pop();
-            for (auto it = current->children.rbegin(); it != current->children.rend(); ++it) {
-                node_stack.push(*it);
-            }
-        }
-        return *this;
     }
 };
 

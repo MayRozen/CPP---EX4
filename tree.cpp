@@ -42,7 +42,7 @@ public:
     }
 
     void add_sub_node(Node<T>& parent, Node<T>& child) { // Adding a new node
-        if (parent.children.size() <= K) { // If we have a "place" for the new kid
+        if (parent.children.size() < K) { // If we have a "place" for the new kid
             parent.add_child(&child);
         } else {
             throw runtime_error("Maximum number of children reached");
@@ -85,21 +85,29 @@ public:
         }
         
         PreOrderIterator& operator++() {
-            Node<T>* current = stack.top();
-            stack.pop();
-
-            // Push children in reverse order (right to left) to simulate pre-order traversal
-            for (size_t i = K - 1; i >= 0; --i) {
-                if (current->children[i])
-                    stack.push(current->children[i]);
+            if (!stack.empty()) {
+                Node<T>* current = stack.top();
+                stack.pop();
+                for (auto it = current->children.rbegin(); it != current->children.rend(); ++it) {
+                    stack.push(*it);
+                }
             }
-
             return *this;
         }
-        
+                
         
         bool operator!=(const PreOrderIterator& other) const {
-            return stack.size() != other.stack.size() || (stack.size() > 0 && stack.top() != other.stack.top());
+            return !(*this == other);
+        }
+
+        bool operator==(const PreOrderIterator& other) const {
+            if (stack.empty() && other.stack.empty()) {
+                return true;
+            }
+            if (!stack.empty() && !other.stack.empty()) {
+                return stack.top() == other.stack.top();
+            }
+            return false;
         }
     };
 
