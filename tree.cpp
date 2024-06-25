@@ -5,311 +5,387 @@
 #include <queue>
 #include <stack>
 #include <iostream>
+#include "node.cpp"
 #include "complex"
-#include "tree.hpp"
 
 using namespace std;
 
-template<typename T, int K>
-void Tree<T, K>::add_root(Node<T>& node) {
-    root = &node; // The root will point of the new node
-}
-
-template<typename T, int K>
-void Tree<T, K>::add_sub_node(Node<T>& parent, Node<T>& child) {
-    if (parent.children.size() <= getK()) { // If we have a "place" for the new kid
-        parent.add_child(&child);
-    } else {
-        throw runtime_error("Maximum number of children reached");
-    }
-}
-
-
-// Overload the output stream operator to print the tree
-// Definition of operator<< for Tree class
-template<typename T, int K>
-ostream& Tree<T ,K>::operator<<(ostream& os) {
-    if (this->root == nullptr) return os;
-    queue<Node<T>*> q;
-    q.push(this->root);
-    while (!q.empty()) {
-        Node<T>* node = q.front();
-        q.pop();
-        os << node->get_value() << " ";
-        for (auto& child : node->children) {
-            q.push(child);
+template<typename T, int K = 2>
+class Tree {
+    private:
+    // Helper function to delete all nodes in the tree recursively
+    void deleteTree(Node<T>* node) {
+        if (node == nullptr) {
+            return;
         }
-    }
-    return os;
-}
-
-// Iterator methods
-template<typename T, int K>
-Tree<T, K>::PreOrderIterator::PreOrderIterator(Node<T>* root) {
-    if (root) {
-        stack.push(root);
-    }
-}
-
-template<typename T, int K>
-Node<T>& Tree<T, K>::PreOrderIterator::operator*() const {
-    return *stack.top();
-}
-
-template<typename T, int K>
-typename Tree<T, K>::PreOrderIterator& Tree<T, K>::PreOrderIterator::operator++() {
-    Node<T>* current = stack.top();
-    stack.pop();
-
-    // Push children in reverse order (right to left) to simulate pre-order traversal
-    for (int i = K - 1; i >= 0; --i) {
-        if (current->children[i])
-            stack.push(current->children[i]);
+        for (Node<T>* child : node->children) {
+            deleteTree(child);
+        }
+        delete node;
     }
 
-    return *this;
-}
+public:
+    Node<T>* root; // The tree is a vector of pointers to the nodes
 
-template<typename T, int K>
-bool Tree<T, K>::PreOrderIterator::operator!=(const PreOrderIterator& other) const {
-    return stack.size() != other.stack.size() || (stack.size() > 0 && stack.top() != other.stack.top());
-}
+    // Static assertion to ensure K is between 2 and 5
+    //static_assert(K >= 2 && K <= 5, "K must be between 2 and 5");
 
-// Implementation of PreOrderIterator::operator->()
-template<typename T, int K>
-Node<T>* Tree<T, K>::PreOrderIterator::operator->() const {
-    return stack.top();
-}
+    Tree() : root(nullptr) {} // Firsofall, the root will be null
 
-template<typename T, int K>
-typename Tree<T, K>::PreOrderIterator Tree<T, K>::begin_pre_order() const {
-    return PreOrderIterator(root);
-}
-
-template<typename T, int K>
-typename Tree<T, K>::PreOrderIterator Tree<T, K>::end_pre_order() const {
-    return PreOrderIterator(nullptr);
-}
-
-// Post-order iterator
-template<typename T, int K>
-Tree<T, K>::PostOrderIterator::PostOrderIterator(Node<T>* root) {
-    if (this->root) {
-        stack.push({ root, false });
+    // Destructor to delete the entire tree
+    ~Tree() {
+        deleteTree(root);
     }
-    advance();
-}
 
-template<typename T, int K>
-Node<T>& Tree<T, K>::PostOrderIterator::operator*() const {
-    return *stack.top().first;
-}
-
-template<typename T, int K>
-typename Tree<T, K>::PostOrderIterator& Tree<T, K>::PostOrderIterator::operator++() {
-    stack.pop();
-    advance();
-    return *this;
-}
-
-template<typename T, int K>
-bool Tree<T, K>::PostOrderIterator::operator!=(const PostOrderIterator& other) const {
-    return stack.size() != other.stack.size() || (stack.size() > 0 && stack.top().first != other.stack.top().first);
-}
-
-template<typename T, int K>
-Node<T>* Tree<T, K>::PostOrderIterator::operator->() const {
-    return stack.top().first;
-}
-
-template<typename T, int K>
-typename Tree<T, K>::PostOrderIterator Tree<T, K>::begin_post_order() const {
-    return PostOrderIterator(root);
-}
-
-template<typename T, int K>
-typename Tree<T, K>::PostOrderIterator Tree<T, K>::end_post_order() const {
-    return PostOrderIterator(nullptr);
-}
-
-// In-order iterator (not applicable for k-ary trees, simulate using DFS)
-template<typename T, int K>
-Tree<T, K>::InOrderIterator::InOrderIterator(Node<T>* root) {
-    if (this->root) {
-        stack.push(this->root);
+    void add_root(Node<T>& node) { // Adding a new root
+        root = &node; // The root will point of the new node
     }
-    advance();
-}
 
-template<typename T, int K>
-Node<T>& Tree<T, K>::InOrderIterator::operator*() const {
-    return *stack.top();
-}
-
-template<typename T, int K>
-typename Tree<T, K>::InOrderIterator& Tree<T, K>::InOrderIterator::operator++() {
-    stack.pop();
-    advance();
-    return *this;
-}
-
-template<typename T, int K>
-bool Tree<T, K>::InOrderIterator::operator!=(const InOrderIterator& other) const {
-    return stack.size() != other.stack.size() || (stack.size() > 0 && stack.top() != other.stack.top());
-}
-
-
-template<typename T, int K>
-Node<T>* Tree<T, K>::InOrderIterator::operator->() const {
-    return stack.top();
-}
-
-template<typename T, int K>
-typename Tree<T, K>::InOrderIterator Tree<T, K>::begin_in_order() const {
-    return InOrderIterator(root);
-}
-
-template<typename T, int K>
-typename Tree<T, K>::InOrderIterator Tree<T, K>::end_in_order() const {
-    return InOrderIterator(nullptr);
-}
-
-// BFS iterator 
-template<typename T, int K>
-Tree<T, K>::BFSIterator::BFSIterator(Node<T>* root) {
-    if (this->root) {
-        queue.push(this->root);
-    }
-}
-
-template<typename T, int K>
-Node<T>&  Tree<T, K>::BFSIterator::operator*() const {
-    return *queue.front();
-}
-
-template<typename T, int K>
-typename Tree<T, K>::BFSIterator&  Tree<T, K>::BFSIterator::operator++() {
-    Node<T>* current = queue.front();
-    queue.pop();
-
-    // Enqueue children in order (left to right) for BFS traversal
-    for (size_t i = 0; i < (size_t)this->getK(); ++i) {
-        if (current->children[i]) {
-            queue.push(current->children[i]);
+    void add_sub_node(Node<T>& parent, Node<T>& child) { // Adding a new node
+        if (parent.children.size() <= K) { // If we have a "place" for the new kid
+            parent.add_child(&child);
+        } else {
+            throw runtime_error("Maximum number of children reached");
         }
     }
 
-    return *this;
-}
-
-template<typename T, int K>
-bool Tree<T, K>::BFSIterator::operator!=(const BFSIterator& other) const {
-    return queue.size() != other.queue.size() || (queue.size() > 0 && queue.front() != other.queue.front());
-}
-
-
-template<typename T, int K>
-Node<T>* Tree<T, K>::BFSIterator::operator->() const {
-    return queue.front();
-}
-
-template<typename T, int K>
-typename Tree<T, K>::BFSIterator Tree<T, K>::begin_bfs_scan() const {
-    return BFSIterator(root);
-}
-
-template<typename T, int K>
-typename Tree<T, K>::BFSIterator Tree<T, K>::end_bfs_scan() const {
-    return BFSIterator(nullptr);
-}
-
-// DFS iterator (using recursive approach)
-template<typename T, int K>
-Tree<T, K>::DFSIterator::DFSIterator(Node<T>* root) {
-    if (this->root) {
-        stack.push(this->root);
-    }
-}
-
-template<typename T, int K>
-Node<T>& Tree<T, K>::DFSIterator::operator*() const {
-    return *stack.top();
-}
-
-template<typename T, int K>
-typename Tree<T, K>::DFSIterator& Tree<T, K>::DFSIterator::operator++() {
-    Node<T>* current = stack.top();
-    stack.pop();
-
-    // Push children in reverse order (right to left) for DFS traversal
-    for (int i = this->getK() - 1; i >= 0; --i) {
-        if (current->children[i])
-            stack.push(current->children[i]);
+    // Overload the output stream operator to print the tree
+    ostream& operator<<(ostream& os) {
+        if (root == nullptr) return os;
+        queue<Node<T>*> q;
+        q.push(root);
+        while (!q.empty()) {
+            Node<T>* node = q.front();
+            q.pop();
+            os << node->get_value() << " ";
+            for (auto& child : node->children) {
+                q.push(child);
+            }
+        }
+        return os;
     }
 
-    return *this;
-}
+    // PreOrderIterator class declaration
+    class PreOrderIterator {
+    private:
+        stack<Node<T>*> stack;
+    public:
+        PreOrderIterator(Node<T>* root) {
+            if (root) {
+                stack.push(root);
+            }
+        }
 
-template<typename T, int K>
-    bool Tree<T, K>::DFSIterator::operator!=(const DFSIterator& other) const {
-        return stack.size() != other.stack.size() || (stack.size() > 0 && stack.top() != other.stack.top());
+        Node<T>* operator->() const {
+            return stack.top();
+        }
+
+        Node<T>& operator*() const {
+            return *stack.top();
+        }
+        
+        PreOrderIterator& operator++() {
+            Node<T>* current = stack.top();
+            stack.pop();
+
+            // Push children in reverse order (right to left) to simulate pre-order traversal
+            for (size_t i = K - 1; i >= 0; --i) {
+                if (current->children[i])
+                    stack.push(current->children[i]);
+            }
+
+            return *this;
+        }
+        
+        
+        bool operator!=(const PreOrderIterator& other) const {
+            return stack.size() != other.stack.size() || (stack.size() > 0 && stack.top() != other.stack.top());
+        }
+    };
+
+    PreOrderIterator begin_pre_order() const {
+        return PreOrderIterator(root);
     }
 
-template<typename T, int K>
-Node<T>* Tree<T, K>::DFSIterator::operator->() const {
-    return stack.top();
-}
-
-template<typename T, int K>
-typename Tree<T, K>::DFSIterator Tree<T, K>::begin_dfs_scan() const {
-    return DFSIterator(root);
-}
-
-template<typename T, int K>
-typename Tree<T, K>::DFSIterator Tree<T, K>::end_dfs_scan() const {
-    return DFSIterator(nullptr);
-}
-
-// Heap iterator
-template<typename T, int K>
-Tree<T, K>::HeapIterator::HeapIterator(Node<T>* root) {
-    if (this->root && this->getK()==2) {
-        fillVector(this->root);
-        heapify();
+    PreOrderIterator end_pre_order() const {
+        return PreOrderIterator(nullptr);
     }
-}
 
-template<typename T, int K>
-Node<T>& Tree<T, K>::HeapIterator::operator*() const {
-    return *heap[0];
-}
+    // PostOrderIterator class declaration
+    class PostOrderIterator {
+    private:
+        stack<pair<Node<T>*, bool>> stack;
+        void advance() {
+        while (!stack.empty() && stack.top().second) {
+            stack.pop();
+        }
+        if (!stack.empty()) {
+            Node<T>* current = stack.top().first;
+            stack.pop();
+            stack.push({ current, true });
 
-template<typename T, int K>
-typename Tree<T, K>::HeapIterator& Tree<T, K>::HeapIterator::operator++() {
-    if (!heap.empty()) {
-        swap(heap[0], heap[heap.size() - 1]);
-        heap.pop_back();
-        siftDown(0, heap.size());
+            // Push children in reverse order (right to left) to simulate post-order traversal
+            for (size_t i = K - 1; i >= 0; --i) {
+                if (current->children[i]) {
+                    stack.push({ current->children[i], false });
+                }
+            }
+        }
     }
-    return *this;
-}
+    public:
+        PostOrderIterator(Node<T>* root) {
+            if (root) {
+                stack.push({ root, false });
+            }
+            advance();
+        }
 
-template<typename T, int K>
-bool Tree<T, K>::HeapIterator::operator!=(const HeapIterator& other) const {
-    return heap.size() != other.heap.size();
-}
+        Node<T>* operator->() const {
+            return stack.top().first;
+        }
 
-template<typename T, int K>
-Node<T>* Tree<T, K>::HeapIterator::operator->() const {
-    return heap.front();
-}
+        Node<T>& operator*() const {
+            return *stack.top().first;
+        }
+        
+        PostOrderIterator& operator++() {
+            stack.pop();
+            advance();
+            return *this;
+        }
 
-template<typename T, int K>
-typename Tree<T, K>::HeapIterator Tree<T, K>::begin_heap() const {
-    return HeapIterator(root);
-}
+        bool operator!=(const PostOrderIterator& other) const {
+            return stack.size() != other.stack.size() || (stack.size() > 0 && stack.top().first != other.stack.top().first);
+        }
+    };
 
-template<typename T, int K>
-typename Tree<T, K>::HeapIterator Tree<T, K>::end_heap() const {
-    return HeapIterator(nullptr);
-}
+    PostOrderIterator begin_post_order() const {
+        return PostOrderIterator(root);
+    }
+
+    PostOrderIterator end_post_order() const {
+        return PostOrderIterator(nullptr);
+    }
+
+    // InOrderIterator class declaration
+    class InOrderIterator {
+    private:
+        stack<Node<T>*> stack;
+        void advance() {
+        while (!stack.empty()) {
+            Node<T>* current = stack.top();
+            stack.pop();
+
+            // Push children in reverse order (right to left) to simulate in-order traversal
+            for (size_t i = K - 1; i >= 0; --i) {
+                if (current->children[i]) {
+                    stack.push(current->children[i]);
+                }
+            }
+
+            if (!stack.empty()) {
+                break;
+            }
+        }
+    }
+    public:
+        InOrderIterator(Node<T>* root) {
+            if (root) {
+                stack.push(root);
+            }
+            advance();
+        }
+
+        Node<T>* operator->() const {
+            return stack.top();
+        }
+        
+        Node<T>& operator*() const {
+            return *stack.top();
+        }
+        
+        InOrderIterator& operator++() {
+            stack.pop();
+            advance();
+            return *this;
+        }
+
+        bool operator!=(const InOrderIterator& other) const {
+            return stack.size() != other.stack.size() || (stack.size() > 0 && stack.top() != other.stack.top());
+        }
+    };
+
+    InOrderIterator begin_in_order() const {
+        return InOrderIterator(root);
+    }
+
+    InOrderIterator end_in_order() const {
+        return InOrderIterator(nullptr);
+    }
+
+    // BFSIterator class declaration
+    class BFSIterator {
+    private:
+        queue<Node<T>*> queue;
+    public:
+        BFSIterator(Node<T>* root) {
+            if (root) {
+                queue.push(root);
+            }
+        }
+
+        Node<T>* operator->() const {
+            return queue.front();
+        }
+
+        Node<T>&  operator*() const {
+            return *queue.front();
+        }
+
+        BFSIterator&  operator++() {
+            Node<T>* current = queue.front();
+            queue.pop();
+
+            // Enqueue children in order (left to right) for BFS traversal
+            for (size_t i = 0; i < (size_t)K; ++i) {
+                if (current->children[i]) {
+                    queue.push(current->children[i]);
+                }
+            }
+
+            return *this;
+        }
+        
+        bool operator!=(const BFSIterator& other) const {
+            return queue.size() != other.queue.size() || (queue.size() > 0 && queue.front() != other.queue.front());
+        }
+    };
+
+    BFSIterator begin_bfs_scan() const {
+        return BFSIterator(root);
+    }
+
+    BFSIterator end_bfs_scan() const {
+        return BFSIterator(nullptr);
+    }
+
+    // DFSIterator class declaration
+    class DFSIterator {
+    private:
+        stack<Node<T>*> stack;
+    public:
+        DFSIterator(Node<T>* root) {
+            if (root) {
+                stack.push(root);
+            }
+        }
+        
+        Node<T>* operator->() const {
+            return stack.top();
+        }
+        Node<T>& operator*() const {
+            return *stack.top();
+        }
+
+        DFSIterator& operator++() {
+            Node<T>* current = stack.top();
+            stack.pop();
+
+            // Push children in reverse order (right to left) for DFS traversal
+            for (size_t i = K - 1; i >= 0; --i) {
+                if (current->children[i])
+                    stack.push(current->children[i]);
+            }
+
+            return *this;
+        }
+
+        bool operator!=(const DFSIterator& other) const {
+            return stack.size() != other.stack.size() || (stack.size() > 0 && stack.top() != other.stack.top());
+        }
+    };
+
+    DFSIterator begin_dfs_scan() const {
+        return DFSIterator(root);
+    }
+
+    DFSIterator end_dfs_scan() const {
+        return DFSIterator(nullptr);
+    }
+
+    // HeapIterator class declaration
+    class HeapIterator {
+    private:
+        vector<Node<T>*> heap;
+        void heapify() {
+            int n = heap.size();
+            for (int i = n / 2 - 1; i >= 0; --i) {
+                siftDown(i, n);
+            }
+        }
+        
+        void siftDown(int i, int n) {
+            int smallest = i;
+            int left = 2 * i + 1;
+            int right = 2 * i + 2;
+
+            if (left < n && heap[left]->data < heap[smallest]->data) {
+                smallest = left;
+            }
+
+            if (right < n && heap[right]->data < heap[smallest]->data) {
+                smallest = right;
+            }
+
+            if (smallest != i) {
+                swap(heap[i], heap[smallest]);
+                siftDown(smallest, n);
+            }
+        }
+        
+        void fillVector(Node<T>* node) {
+            if (!node) return;
+            heap.push_back(node);
+            for (size_t i = 0; i < (size_t)K; ++i) {
+                fillVector(node->children[i]);
+            }
+        }
+    public:
+        HeapIterator(Node<T>* root) {
+            if (root && K==2) {
+                fillVector(root);
+                heapify();
+            }
+        }
+
+        Node<T>* operator->() const {
+            return heap.front();
+        }
+
+        Node<T>& operator*() const {
+            return *heap[0];
+        }
+
+        HeapIterator& operator++() {
+            if (!heap.empty()) {
+                swap(heap[0], heap[heap.size() - 1]);
+                heap.pop_back();
+                siftDown(0, heap.size());
+            }
+            return *this;
+        }
+
+        bool operator!=(const HeapIterator& other) const {
+            return heap.size() != other.heap.size();
+        }
+
+    };
+
+    HeapIterator begin_heap() const {
+        return HeapIterator(root);
+    }
+
+    HeapIterator end_heap() const {
+        return HeapIterator(nullptr);
+    }
+};
