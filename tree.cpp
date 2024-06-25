@@ -122,38 +122,41 @@ public:
     // PostOrderIterator class declaration
     class PostOrderIterator {
     private:
-        stack<pair<Node<T>*, bool>> stack;
-        void advance() {
-        while (!stack.empty() && stack.top().second) {
-            stack.pop();
-        }
-        if (!stack.empty()) {
-            Node<T>* current = stack.top().first;
-            stack.pop();
-            stack.push({ current, true });
+        std::stack<Node<T>*> stack;
+        std::stack<Node<T>*> visited;
 
-            // Push children in reverse order (right to left) to simulate post-order traversal
-            for (size_t i = K - 1; i >= 0; --i) {
-                if (current->children[i]) {
-                    stack.push({ current->children[i], false });
+        void advance() {
+            while (!stack.empty()) {
+                Node<T>* node = stack.top();
+                if (!node || (!node->children.empty() && (visited.empty() || visited.top() != node))) {
+                    if (node) {
+                        visited.push(node);
+                        stack.pop();  
+                    }
+                    stack.push(node); 
+                    for (auto it = node->children.rbegin(); it != node->children.rend(); ++it) {
+                        stack.push(*it);
+                    }
+                         
+                } else {
+                    return;
                 }
             }
         }
-    }
     public:
         PostOrderIterator(Node<T>* root) {
             if (root) {
-                stack.push({ root, false });
+                stack.push(root);
+                advance();
             }
-            advance();
         }
 
         Node<T>* operator->() const {
-            return stack.top().first;
+            return stack.top();
         }
 
         Node<T>& operator*() const {
-            return *stack.top().first;
+            return *stack.top();
         }
         
         PostOrderIterator& operator++() {
@@ -163,7 +166,7 @@ public:
         }
 
         bool operator!=(const PostOrderIterator& other) const {
-            return stack.size() != other.stack.size() || (stack.size() > 0 && stack.top().first != other.stack.top().first);
+            return !stack.empty();
         }
     };
 
