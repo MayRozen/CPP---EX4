@@ -130,15 +130,15 @@ public:
                 Node<T>* node = stack.top();
                 if (!node || (!node->children.empty() && (visited.empty() || visited.top() != node))) {
                     if (node) {
-                        visited.push(node);
-                        stack.pop();  
+                        visited.push(node); // In node to visited 
                     }
-                    stack.push(node); 
+                    stack.pop(); // Take it out of the stack
+                    stack.push(node);
                     for (auto it = node->children.rbegin(); it != node->children.rend(); ++it) {
                         stack.push(*it);
                     }
                          
-                } else {
+                } else { // If node=nullptr -> stop
                     return;
                 }
             }
@@ -254,13 +254,15 @@ public:
         }
 
         BFSIterator&  operator++() {
-            Node<T>* current = queue.front();
-            queue.pop();
+            if (!queue.empty()) {
+                Node<T>* current = queue.front();
+                queue.pop();
 
-            // Enqueue children in order (left to right) for BFS traversal
-            for (size_t i = 0; i < (size_t)K; ++i) {
-                if (current->children[i]) {
-                    queue.push(current->children[i]);
+                // Enqueue children in order (left to right) for BFS traversal
+                for (auto& child : current->children) {
+                    if (child) { // Check to ensure child is not nullptr
+                        queue.push(child);
+                    }
                 }
             }
 
