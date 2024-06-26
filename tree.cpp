@@ -141,13 +141,28 @@ public:
         }
         
         PostOrderIterator& operator++() {
+            std::stack<Node<T>*> ans;
+            std::stack<Node<T>*> tempStack;
             if (!stack.empty()) {
                 Node<T>* current = stack.top(); // The current node being processed in the traversal
                 stack.pop(); // Removes this node from the stack because it's being processed
                 for (auto it = current->children.begin(); it != current->children.end(); ++it) {
                     stack.push(*it);
-                }
+                } 
             }
+
+            // Transfer elements from tempStack to ans (reversed order)
+            while (!tempStack.empty()) {
+                ans.push(tempStack.top());
+                tempStack.pop();
+            }
+
+            // Transfer elements back to stack
+            while (!ans.empty()) {
+                stack.push(ans.top());
+                ans.pop();
+            }
+            
             return *this;
         }
 
