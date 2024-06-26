@@ -41,28 +41,24 @@ int main()
     {
         cout << node->get_value() << endl;
     } // prints: 1.1, 1.2, 1.4, 1.5, 1.3, 1.6
-
     cout<<"pre_order success!"<<endl;
 
-    // for (auto node = tree.begin_post_order(); node != tree.end_post_order(); ++node)
-    // {
-    //     cout << node->get_value() << endl;
-    // } // prints: 1.4, 1.5, 1.2, 1.6, 1.3, 1.1
-
-    // cout<<"post_order success!"<<endl;
+    for (auto node = tree.begin_post_order(); node != tree.end_post_order(); ++node)
+    {
+        cout << node->get_value() << endl;
+    } // prints: 1.4, 1.5, 1.2, 1.6, 1.3, 1.1
+    cout<<"post_order success!"<<endl;
 
     // for (auto node = tree.begin_in_order(); node != tree.end_in_order(); ++node)
     // {
     //     cout << node->get_value() << endl;
     // } // prints: 1.4, 1.2, 1.5, 1.1, 1.6, 1.3
-
     //cout<<"in_order success!"<<endl;
 
     for (auto node = tree.begin_bfs_scan(); node != tree.end_bfs_scan(); ++node)
     {
         cout << node->get_value() << endl;
     } // prints: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6
-
     cout<<"bfs_scan success!"<<endl;
 
     // for (auto node : tree)
@@ -75,10 +71,15 @@ int main()
     Tree<double,3> three_ary_tree; // 3-ary tree.
     three_ary_tree.add_root(root_node);
     three_ary_tree.add_sub_node(root_node, n1);
+    cout<<"first child"<<endl;
     three_ary_tree.add_sub_node(root_node, n2);
+    cout<<"seconed child"<<endl;
     three_ary_tree.add_sub_node(root_node, n3);
+    cout<<"third child"<<endl;
     three_ary_tree.add_sub_node(n1, n4);
+    cout<<"n1 child"<<endl;
     three_ary_tree.add_sub_node(n2, n5);
+    cout<<"n2 child"<<endl;
 
      // The tree should look like:
     /**

@@ -30,7 +30,7 @@ public:
     // Static assertion to ensure K is between 2 and 5
     //static_assert(K >= 2 && K <= 5, "K must be between 2 and 5");
 
-    Tree() : root(nullptr) {} // Firsofall, the root will be null
+    Tree() : root(nullptr){} // Firsofall, the root will be null
 
     // Destructor to delete the entire tree
     ~Tree() {
@@ -42,7 +42,7 @@ public:
     }
 
     void add_sub_node(Node<T>& parent, Node<T>& child) { // Adding a new node
-        if (parent.children.size() < K) { // If we have a "place" for the new kid
+        if (parent.children.size() <= K+1) { // If we have a "place" for the new kid
             parent.add_child(&child);
         } else {
             throw runtime_error("Maximum number of children reached");
@@ -65,7 +65,7 @@ public:
         return os;
     }
 
-    // PreOrderIterator class declaration
+//---------------------------------PreOrderIterator---------------------------------
     class PreOrderIterator {
     private:
         stack<Node<T>*> stack;
@@ -86,8 +86,10 @@ public:
         
         PreOrderIterator& operator++() {
             if (!stack.empty()) {
-                Node<T>* current = stack.top();
-                stack.pop();
+                Node<T>* current = stack.top(); // The current node being processed in the traversal
+                stack.pop(); // Removes this node from the stack because it's being processed
+
+                // Iterate over these children in reverse order (from last to first)
                 for (auto it = current->children.rbegin(); it != current->children.rend(); ++it) {
                     stack.push(*it);
                 }
@@ -119,35 +121,14 @@ public:
         return PreOrderIterator(nullptr);
     }
 
-    // PostOrderIterator class declaration
+//---------------------------------PostOrderIterator---------------------------------
     class PostOrderIterator {
     private:
-        std::stack<Node<T>*> stack;
-        std::stack<Node<T>*> visited;
-
-        void advance() {
-            while (!stack.empty()) {
-                Node<T>* node = stack.top();
-                if (!node || (!node->children.empty() && (visited.empty() || visited.top() != node))) {
-                    if (node) {
-                        visited.push(node); // In node to visited 
-                    }
-                    stack.pop(); // Take it out of the stack
-                    stack.push(node);
-                    for (auto it = node->children.rbegin(); it != node->children.rend(); ++it) {
-                        stack.push(*it);
-                    }
-                         
-                } else { // If node=nullptr -> stop
-                    return;
-                }
-            }
-        }
+        stack<Node<T>*> stack;
     public:
         PostOrderIterator(Node<T>* root) {
             if (root) {
                 stack.push(root);
-                advance();
             }
         }
 
@@ -160,8 +141,13 @@ public:
         }
         
         PostOrderIterator& operator++() {
-            stack.pop();
-            advance();
+            if (!stack.empty()) {
+                Node<T>* current = stack.top(); // The current node being processed in the traversal
+                stack.pop(); // Removes this node from the stack because it's being processed
+                for (auto it = current->children.begin(); it != current->children.end(); ++it) {
+                    stack.push(*it);
+                }
+            }
             return *this;
         }
 
@@ -178,7 +164,7 @@ public:
         return PostOrderIterator(nullptr);
     }
 
-    // InOrderIterator class declaration
+//---------------------------------InOrderIterator---------------------------------
     class InOrderIterator {
     private:
         stack<Node<T>*> stack;
@@ -234,7 +220,7 @@ public:
         return InOrderIterator(nullptr);
     }
 
-    // BFSIterator class declaration
+//---------------------------------BFSIterator---------------------------------
     class BFSIterator {
     private:
         queue<Node<T>*> queue;
@@ -282,7 +268,7 @@ public:
         return BFSIterator(nullptr);
     }
 
-    // DFSIterator class declaration
+//---------------------------------DFSIterator---------------------------------
     class DFSIterator {
     private:
         stack<Node<T>*> stack;
@@ -326,7 +312,7 @@ public:
         return DFSIterator(nullptr);
     }
 
-    // HeapIterator class declaration
+//---------------------------------HeapIterator---------------------------------
     class HeapIterator {
     private:
         vector<Node<T>*> heap;
