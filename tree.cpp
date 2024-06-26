@@ -141,8 +141,7 @@ public:
         }
         
         PostOrderIterator& operator++() {
-            std::stack<Node<T>*> ans;
-            std::stack<Node<T>*> tempStack;
+
             if (!stack.empty()) {
                 Node<T>* current = stack.top(); // The current node being processed in the traversal
                 stack.pop(); // Removes this node from the stack because it's being processed
@@ -151,18 +150,6 @@ public:
                 } 
             }
 
-            // Transfer elements from tempStack to ans (reversed order)
-            while (!tempStack.empty()) {
-                ans.push(tempStack.top());
-                tempStack.pop();
-            }
-
-            // Transfer elements back to stack
-            while (!ans.empty()) {
-                stack.push(ans.top());
-                ans.pop();
-            }
-            
             return *this;
         }
 
@@ -183,29 +170,24 @@ public:
     class InOrderIterator {
     private:
         stack<Node<T>*> stack;
-        void advance() {
-        while (!stack.empty()) {
-            Node<T>* current = stack.top();
-            stack.pop();
 
-            // Push children in reverse order (right to left) to simulate in-order traversal
-            for (size_t i = K - 1; i >= 0; --i) {
-                if (current->children[i]) {
-                    stack.push(current->children[i]);
-                }
-            }
-
-            if (!stack.empty()) {
-                break;
+        Node<T>* getLeftmostChild(Node<T>* node) {
+            if (node->children.empty()) {
+                return nullptr; // No children
+            } else {
+                return node->children.front(); // Return the leftmost child
             }
         }
-    }
+
+        void pushLeftmostNodes(Node<T>* node) {
+            while (node) {
+                stack.push(node); // Push current node onto the stack
+                node = getLeftmostChild(node); // Get the leftmost child (or nullptr)
+            }
+        }
     public:
         InOrderIterator(Node<T>* root) {
-            if (root) {
-                stack.push(root);
-            }
-            advance();
+            pushLeftmostNodes(root); // Start with the leftmost nodes of the tree
         }
 
         Node<T>* operator->() const {
@@ -217,8 +199,17 @@ public:
         }
         
         InOrderIterator& operator++() {
-            stack.pop();
-            advance();
+            if (!stack.empty()) {
+                Node<T>* current = stack.top();
+                stack.pop();
+
+                // Push the leftmost nodes of the rightmost child onto the stack
+                Node<T>* next = getLeftmostChild(current);
+                if (next) {
+                    pushLeftmostNodes(next);
+                }
+            }
+
             return *this;
         }
 
@@ -302,15 +293,15 @@ public:
         }
 
         DFSIterator& operator++() {
-            Node<T>* current = stack.top();
-            stack.pop();
+            if (!stack.empty()) {
+                Node<T>* current = stack.top();
+                stack.pop();
 
-            // Push children in reverse order (right to left) for DFS traversal
-            for (size_t i = K - 1; i >= 0; --i) {
-                if (current->children[i])
-                    stack.push(current->children[i]);
+                // Push children in reverse order (right to left) for DFS traversal
+                for (auto it = current->children.rbegin(); it != current->children.rend(); ++it) {
+                    stack.push(*it);
+                }
             }
-
             return *this;
         }
 
