@@ -12,33 +12,30 @@ using namespace std;
 
 template<typename T, int K = 2>
 class Tree {
-    private:
-    // Helper function to delete all nodes in the tree recursively
-    void deleteTree(Node<T>* node) {
+private:
+    void delete_subtree(Node<T>* node) {
         if (node == nullptr) {
             return;
         }
         for (Node<T>* child : node->children) {
-            child->~Node();
+            delete_subtree(child); // Recursively delete children
         }
-        node->~Node();
+        delete node; // Delete the current node
     }
-
 public:
-    Node<T>* root; // The tree is a vector of pointers to the nodes
+     Node<T>* root;
 
-    // Static assertion to ensure K is between 2 and 5
-    //static_assert(K >= 2 && K <= 5, "K must be between 2 and 5");
+    Tree() : root(nullptr) {}
 
-    Tree() : root(nullptr){} // Firsofall, the root will be null
-
-    // Destructor to delete the entire tree
     ~Tree() {
-        deleteTree(root);
+        if (root != nullptr) {
+            delete_subtree(root); // Delete the entire subtree recursively
+            root = nullptr; // Set root to nullptr after deletion
+        }
     }
 
-    void add_root(Node<T>& node) { // Adding a new root
-        root = &node; // The root will point of the new node
+    void add_root(Node<T>& node) {
+        root = &node; // Store the pointer to the node
     }
 
     void add_sub_node(Node<T>& parent, Node<T>& child) { // Adding a new node
