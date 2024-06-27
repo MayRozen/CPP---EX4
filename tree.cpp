@@ -19,9 +19,9 @@ class Tree {
             return;
         }
         for (Node<T>* child : node->children) {
-            deleteTree(child);
+            child->~Node();
         }
-        delete node;
+        node->~Node();
     }
 
 public:
@@ -43,7 +43,7 @@ public:
 
     void add_sub_node(Node<T>& parent, Node<T>& child) { // Adding a new node
         if (parent.children.size() <= K+1) { // If we have a "place" for the new kid
-            parent.add_child(&child);
+            parent.add_child(child);
         } else {
             throw runtime_error("Maximum number of children reached");
         }
@@ -190,71 +190,54 @@ public:
     }
 
 //---------------------------------InOrderIterator---------------------------------
-    class InOrderIterator {
-    private:
-        stack<Node<T>*> stack;
-
-        Node<T>* getLeftmostChild(Node<T>* node) { 
-            // std::vector<Node<T>*> tempChild;
-            // for(size_t i=0; i<node->children.size(); ++i){
-            //     tempChild.push_back(node->children[i]);
-            //     cout<<"check:"<<node->children[i]<<endl;
-            //     cout<<"check:"<<tempChild[i]<<endl;
-            // }
-            
-            if(!node->children.empty()) {
-                Node<T>* temp = node->children.front();
-                node->children.erase(node->children.begin());
-                return temp;
-            }
-            return nullptr;
-        }
-
-        void pushLeftmostNodes(Node<T>* node) {
-            while (node) {
-                stack.push(node); // Push current node onto the stack
-                node = getLeftmostChild(node); // Get the leftmost child (or nullptr)
-            }
-        }
+class InOrderIterator {
     public:
-        InOrderIterator(Node<T>* root) {
-            pushLeftmostNodes(root); // Start with the leftmost nodes of the tree
-        }
-
-        Node<T>* operator->() const {
-            if (stack.empty()) {
-                return nullptr;
-            }
-            return stack.top();
-        }
-        
-        Node<T>& operator*() const {
-            if (stack.empty()) {
-                throw std::runtime_error("Cannot dereference end iterator");
-            }
-            return *stack.top();
-        }
-        
-        InOrderIterator& operator++() {
-            if (!stack.empty()) {
-                Node<T>* current = stack.top();
-                stack.pop();
-
-                // Push the leftmost nodes of the rightmost child onto the stack
-                Node<T>* next = getLeftmostChild(current);
-                if (next) {
-                    pushLeftmostNodes(next);
-                }
-            }
-
-            return *this;
+        explicit InOrderIterator(Node<T>* root) {
+            pushLeft(root);
         }
 
         bool operator!=(const InOrderIterator& other) const {
-            // Compare the current node pointers pointed by the iterators
-            return stack.size() != other.stack.size() || (stack.size() > 0 && stack.top() != other.stack.top());
+            return !(*this == other);
         }
-    };
+
+        bool operator==(const InOrderIterator& other) const {
+            return nodes == other.nodes;
+        }
+
+        Node<T>& operator*() const {
+            return *nodes.top();
+        }
+
+        InOrderIterator& operator++() {
+            if (!nodes.empty()) {
+                Node<T>* current = nodes.top();
+                nodes.pop();
+                if (!current->children.empty()) {
+                    pushLeft(current->children[1]);
+                }
+            }
+            return *this;
+        }
+
+        Node<T>* operator->() const {
+            return nodes.top();
+        }
+
+    private:
+        stack<Node<T>*> nodes;
+
+        void pushLeft(Node<T>* node) {
+            while (node) {
+                nodes.push(node);
+                if (!node->children.empty()) {
+                    node = node->children[0];
+                }
+                else {
+                    break;
+                }
+            }
+        }
+};
 
     InOrderIterator begin_in_order() const {
         return InOrderIterator(root);

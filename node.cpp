@@ -15,9 +15,6 @@ public:
     Node(T val) : value(val) {} // constructor
 
     ~Node() {
-        for (Node<T>* child : children) {
-            delete child;  // Recursively delete children
-        }
         children.clear();  // Clear the vector of children
     }
 
@@ -25,15 +22,8 @@ public:
         return value;
     }
 
-    void add_child(Node<T>* child) {
-        children.push_back(child);
-    }
-
-    T get_child_value(std::size_t index) const {
-        if (index < children.size()) {
-            return children[index]->value;
-        } 
-        return -1;
+    void add_child(Node<T>& child) {
+        children.push_back(&child);
     }
 };
 
