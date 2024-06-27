@@ -8,12 +8,15 @@ VALGRIND_FLAGS = -v --leak-check=full --show-leak-kinds=all --error-exitcode=99
 SOURCES = node.cpp tree.cpp Complex.cpp TestCounter.cpp Test.cpp
 OBJECTS = $(SOURCES:.cpp=.o)
 
+# SFML libraries
+SFML_LIBS = -lsfml-graphics -lsfml-window -lsfml-system
+
 run: demo test
 	./demo
 	./test
 
 demo: Demo.o $(filter-out TestCounter.o Test.o, $(OBJECTS))
-	$(CXX) $(CXXFLAGS) -v $^ -o demo
+	$(CXX) $(CXXFLAGS) -v $^ $(SFML_LIBS) -o demo
 
 test: TestCounter.o Test.o $(filter-out Demo.o, $(OBJECTS))
 	$(CXX) $(CXXFLAGS) -v $^ -o test

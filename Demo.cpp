@@ -6,9 +6,46 @@
  */
 #include <iostream>
 #include <string>
+#include <SFML/Graphics.hpp>
 #include "tree.cpp"
 
 using namespace std;
+// Function to draw the tree using SFML
+template<typename T>
+void draw_tree(sf::RenderWindow& window, const Tree<T>& tree, const Node<T>& node, float x, float y, float horizontal_spacing)
+{
+    sf::CircleShape circle(30); // Circle shape for each node
+    circle.setFillColor(sf::Color::Blue); // Set node color
+
+    // Position the circle
+    circle.setPosition(x, y);
+    window.draw(circle);
+
+    // Draw text (node value)
+    sf::Font font;
+    if (!font.loadFromFile("path/to/arial.ttf")) { // Replace with actual path
+        cerr << "Failed to load font 'arial.ttf'!" << endl;
+        return;
+    }
+
+    sf::Text text(to_string(node.get_value()), font, 20);
+    text.setFillColor(sf::Color::White);
+    text.setStyle(sf::Text::Bold);
+    text.setPosition(x + 10, y + 10);
+    window.draw(text);
+
+    // Calculate positions for child nodes
+    auto children = tree.root->children;
+    int num_children = children.size();
+    float start_x = x - (num_children - 1) * horizontal_spacing / 2;
+
+    // Recursively draw child nodes
+    for (size_t i = 0; i < children.size(); ++i) {
+        draw_tree(window, tree, *children[i], start_x + i * horizontal_spacing, y + 100, horizontal_spacing / 2);
+    }
+}
+
+
 
 int main()
 {
@@ -27,6 +64,25 @@ int main()
     tree.add_sub_node(n1, n3);
     tree.add_sub_node(n1, n4);
     tree.add_sub_node(n2, n5);
+    
+    // Create SFML window
+    sf::RenderWindow window(sf::VideoMode(800, 600), "SFML Tree Visualization");
+
+    // Main loop
+    while (window.isOpen()) {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed)
+                window.close();
+        }
+
+        window.clear(sf::Color::White);
+
+        // Draw the tree starting from the root node
+        draw_tree(window, tree, root_node, 400, 50, 300);
+
+        window.display();
+    }
    
     // The tree should look like:
     /**
@@ -72,6 +128,11 @@ int main()
     } // prints: 1.1 1.2 1.4 1.5 1.3 1.6
     cout<<"dfs_scan success!"<<endl;
 
+    // cout << "Heap traversal:" << endl;
+    // for (auto it = tree.begin_heap(); it != tree.end_heap(); ++it) {
+    //     cout << it->get_value() << " ";
+    // }
+    // cout << "Heap traversal success!" << endl;
 
 
     // for (auto node : tree)
@@ -102,5 +163,7 @@ int main()
      *   /        |
      *  1.5      1.6
      */
+    // Create SFML window
     
+    return 0;
 }

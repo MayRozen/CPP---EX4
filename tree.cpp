@@ -322,6 +322,14 @@ public:
     class HeapIterator {
     private:
         vector<Node<T>*> heap;
+
+        Node<T>* operator[](size_t index) const {
+            if (index >= heap.size()) {
+                throw out_of_range("Index out of bounds");
+            }
+            return heap[index];
+        }
+        
         void heapify() {
             int n = heap.size();
             for (int i = n / 2 - 1; i >= 0; --i) {
