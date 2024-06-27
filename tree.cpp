@@ -124,37 +124,60 @@ public:
 //---------------------------------PostOrderIterator---------------------------------
     class PostOrderIterator {
     private:
+        Node<T>* root;
         stack<Node<T>*> stack;
+
+        void init(Node<T>* node){
+            if(node) {
+                stack.push(node);
+                for(auto it = node->children.rbegin(); it != node->children.rend(); ++it ){
+                    init(*it);
+                }
+            }
+        }
+        
     public:
-        PostOrderIterator(Node<T>* root) {
-            if (root) {
-                stack.push(root);
+        PostOrderIterator(Node<T>* r) : root(nullptr) {
+            if (r) {
+                init(r);
+                root = stack.top();
             }
         }
 
-        Node<T>* operator->() const {
-            return stack.top();
+        Node<T>* get_root() const {
+            return root;
+        }
+
+        Node<T>& operator->() const {
+            return *root;
         }
 
         Node<T>& operator*() const {
-            return *stack.top();
+            return *root;
         }
         
         PostOrderIterator& operator++() {
 
             if (!stack.empty()) {
-                Node<T>* current = stack.top(); // The current node being processed in the traversal
                 stack.pop(); // Removes this node from the stack because it's being processed
-                for (auto it = current->children.begin(); it != current->children.end(); ++it) {
-                    stack.push(*it);
-                } 
+                if (!stack.empty()) {
+                    root = stack.top();
+                } else {
+                    root = nullptr;
+                }
+            } else {
+                root = nullptr;
             }
 
             return *this;
         }
 
         bool operator!=(const PostOrderIterator& other) const {
-            return !stack.empty();
+            return root != other.root;
+        }
+
+        bool operator==(const PostOrderIterator& other) const {
+            return root == other.root;
         }
     };
 
@@ -172,11 +195,10 @@ public:
         stack<Node<T>*> stack;
 
         Node<T>* getLeftmostChild(Node<T>* node) {
-            if (node->children.empty()) {
-                return nullptr; // No children
-            } else {
-                return node->children.front(); // Return the leftmost child
+            if (node && !node->children.empty()) {  // Changed here
+                return node->children.front();
             }
+            return nullptr;
         }
 
         void pushLeftmostNodes(Node<T>* node) {
@@ -191,10 +213,16 @@ public:
         }
 
         Node<T>* operator->() const {
+            if (stack.empty()) {
+                return nullptr;
+            }
             return stack.top();
         }
         
         Node<T>& operator*() const {
+            if (stack.empty()) {
+                throw std::runtime_error("Cannot dereference end iterator");
+            }
             return *stack.top();
         }
         
@@ -214,6 +242,7 @@ public:
         }
 
         bool operator!=(const InOrderIterator& other) const {
+            // Compare the current node pointers pointed by the iterators
             return stack.size() != other.stack.size() || (stack.size() > 0 && stack.top() != other.stack.top());
         }
     };

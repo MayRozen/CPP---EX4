@@ -103,7 +103,7 @@ int main()
     cout<<"post_order:"<<endl;
     for (auto node = tree.begin_post_order(); node != tree.end_post_order(); ++node)
     {
-        cout << node->get_value() << endl;
+        cout << node.get_root()->get_value() << endl;
     } // prints: 1.4, 1.5, 1.2, 1.6, 1.3, 1.1
     cout<<"post_order success!"<<endl;
 
