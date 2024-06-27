@@ -194,9 +194,18 @@ public:
     private:
         stack<Node<T>*> stack;
 
-        Node<T>* getLeftmostChild(Node<T>* node) {
-            if (node && !node->children.empty()) {  // Changed here
-                return node->children.front();
+        Node<T>* getLeftmostChild(Node<T>* node) { 
+            // std::vector<Node<T>*> tempChild;
+            // for(size_t i=0; i<node->children.size(); ++i){
+            //     tempChild.push_back(node->children[i]);
+            //     cout<<"check:"<<node->children[i]<<endl;
+            //     cout<<"check:"<<tempChild[i]<<endl;
+            // }
+            
+            if(!node->children.empty()) {
+                Node<T>* temp = node->children.front();
+                node->children.erase(node->children.begin());
+                return temp;
             }
             return nullptr;
         }

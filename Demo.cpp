@@ -12,7 +12,7 @@
 using namespace std;
 // Function to draw the tree using SFML
 template<typename T>
-void draw_tree(sf::RenderWindow& window, const Tree<T>& tree, const Node<T>& node, float x, float y, float horizontal_spacing)
+void draw_tree(sf::RenderWindow& window, const Node<T>& node, float x, float y, float horizontal_spacing, float vertical_spacing)
 {
     sf::CircleShape circle(30); // Circle shape for each node
     circle.setFillColor(sf::Color::Blue); // Set node color
@@ -24,28 +24,37 @@ void draw_tree(sf::RenderWindow& window, const Tree<T>& tree, const Node<T>& nod
     // Draw text (node value)
     sf::Font font;
     if (!font.loadFromFile("path/to/arial.ttf")) { // Replace with actual path
-        cerr << "Failed to load font 'arial.ttf'!" << endl;
+        std::cerr << "Failed to load font 'arial.ttf'!" << std::endl;
         return;
     }
 
-    sf::Text text(to_string(node.get_value()), font, 20);
+    sf::Text text(std::to_string(node.get_value()), font, 20);
     text.setFillColor(sf::Color::White);
     text.setStyle(sf::Text::Bold);
-    text.setPosition(x + 10, y + 10);
+    text.setPosition(x + 10, y + 5); // Adjusted to center the text inside the circle
     window.draw(text);
 
     // Calculate positions for child nodes
-    auto children = tree.root->children;
+    auto children = node.children;
     int num_children = children.size();
     float start_x = x - (num_children - 1) * horizontal_spacing / 2;
 
     // Recursively draw child nodes
     for (size_t i = 0; i < children.size(); ++i) {
-        draw_tree(window, tree, *children[i], start_x + i * horizontal_spacing, y + 100, horizontal_spacing / 2);
+        float child_x = start_x + i * horizontal_spacing;
+        float child_y = y + vertical_spacing;
+
+        // Draw a line connecting the current node to the child node
+        sf::Vertex line[] =
+        {
+            sf::Vertex(sf::Vector2f(x + 30, y + 30)), // Start point (center of current node)
+            sf::Vertex(sf::Vector2f(child_x + 30, child_y)) // End point (center of child node)
+        };
+        window.draw(line, 2, sf::Lines);
+
+        draw_tree(window, *children[i], child_x, child_y, horizontal_spacing / 2, vertical_spacing);
     }
 }
-
-
 
 int main()
 {
@@ -79,7 +88,7 @@ int main()
         window.clear(sf::Color::White);
 
         // Draw the tree starting from the root node
-        draw_tree(window, tree, root_node, 400, 50, 300);
+        draw_tree(window, root_node, 400, 50, 300, 100);
 
         window.display();
     }
