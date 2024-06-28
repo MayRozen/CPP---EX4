@@ -23,7 +23,7 @@ private:
         delete node; // Delete the current node
     }
 public:
-     Node<T>* root;
+    Node<T>* root;
 
     Tree() : root(nullptr) {}
 

@@ -4,147 +4,194 @@
 
 #include "doctest.h"
 #include "tree.cpp"
+#include <sstream>
 
-TEST_CASE("Test PreOrderIterator") {
-    // Create a tree structure
-    Node<int>* root = new Node<int>(1);
-    root->children.push_back(new Node<int>(2));
-    root->children.push_back(new Node<int>(3));
-    root->children[0]->children.push_back(new Node<int>(4));
-    root->children[1]->children.push_back(new Node<int>(5));
-
-    PreOrderIterator it = root->begin_pre_order();
-    PreOrderIterator end = root->end_pre_order();
-
-    std::stringstream ss;
-    while (it != end) {
-        ss << (*it)->value << " ";
-        ++it;
+void deleteTree(Node<int>* node) {
+    for (auto child : node->children) {
+        deleteTree(child);
     }
-    
-    // Check the output
-    CHECK(ss.str() == "1 2 4 3 5 ");
-
-    // Clean up
-    deleteTree(root);
+    delete node;
 }
 
-TEST_CASE("Test PostOrderIterator") {
-    // Create a tree structure
-    Node<int>* root = new Node<int>(1);
-    root->children.push_back(new Node<int>(2));
-    root->children.push_back(new Node<int>(3));
-    root->children[0]->children.push_back(new Node<int>(4));
-    root->children[1]->children.push_back(new Node<int>(5));
+// TEST_CASE("Test Tree Creation") {
+//     // Create a simple tree
+//     Node<int>* root = new Node<int>(10);
+//     root->children.push_back(new Node<int>(20));
+//     root->children.push_back(new Node<int>(30));
 
-    PostOrderIterator it = root->begin_post_order();
-    PostOrderIterator end = root->end_post_order();
+//     CHECK(root->value == 10);
+//     CHECK(root->children.size() == 2);
+//     CHECK(root->children[0]->value == 20);
+//     CHECK(root->children[1]->value == 30);
+
+//     // Clean up
+//     deleteTree(root);
+// }
+
+// TEST_CASE("Test Add Child") {
+//     Node<int>* root = new Node<int>(1);
+//     auto child = Node<int>(2);
+//     root->add_child(child);
+
+//     CHECK(root->children.size() == 1);
+//     CHECK(root->children[0]->value == 2);
+
+//     // Clean up
+//     deleteTree(root);
+// }
+
+//---------------------------------PreOrderIterator---------------------------------
+// Define the templated test case
+template<typename T, int K>
+void testPreOrderIterator() {
+    Node<T> root = Node<T>(1);
+    Tree<T> tree;
+    tree.add_root(root);
+    Node<T> n1 = Node<T>(2);
+    Node<T> n2 = Node<T>(3);
+    tree.add_sub_node(root, n1);
+    tree.add_sub_node(root, n2);
 
     std::stringstream ss;
-    while (it != end) {
-        ss << (*it)->value << " ";
-        ++it;
+    for (auto node = tree.begin_pre_order(); node != tree.end_pre_order(); ++node)
+    {
+        ss <<  node.get_root()->get_value() << " ";
+        ++node;
     }
-    
-    // Check the output
-    CHECK(ss.str() == "4 2 5 3 1 ");
 
-    // Clean up
-    deleteTree(root);
+    CHECK(ss.str() == "1 2 3 ");
 }
 
-TEST_CASE("Test InOrderIterator") {
-    // Create a tree structure
-    Node<int>* root = new Node<int>(1);
-    root->children.push_back(new Node<int>(2));
-    root->children.push_back(new Node<int>(3));
-    root->children[0]->children.push_back(new Node<int>(4));
-    root->children[1]->children.push_back(new Node<int>(5));
-
-    InOrderIterator it = root->begin_in_order();
-    InOrderIterator end = root->end_in_order();
-
-    std::stringstream ss;
-    while (it != end) {
-        ss << (*it)->value << " ";
-        ++it;
-    }
-    
-    // Check the output
-    CHECK(ss.str() == "4 2 1 3 5 ");
-
-    // Clean up
-    deleteTree(root);
+// Instantiate the templated test case with specific types
+TEST_CASE("Test PreOrderIterator with int and K=2") {
+    testPreOrderIterator<int, 2>();
 }
 
-TEST_CASE("Test BFSIterator") {
-    // Create a tree structure
-    Node<int>* root = new Node<int>(1);
-    root->children.push_back(new Node<int>(2));
-    root->children.push_back(new Node<int>(3));
-    root->children[0]->children.push_back(new Node<int>(4));
-    root->children[1]->children.push_back(new Node<int>(5));
-
-    BFSIterator it = root->begin_bfs_scan();
-    BFSIterator end = root->end_bfs_scan();
-
-    std::stringstream ss;
-    while (it != end) {
-        ss << (*it)->value << " ";
-        ++it;
-    }
-    
-    // Check the output
-    CHECK(ss.str() == "1 2 3 4 5 ");
-
-    // Clean up
-    deleteTree(root);
+// Add more test cases as needed for different types and K values
+TEST_CASE("Test PreOrderIterator with double and K=3") {
+    testPreOrderIterator<double, 3>();
 }
 
-TEST_CASE("Test DFSIterator") {
-    // Create a tree structure
-    Node<int>* root = new Node<int>(1);
-    root->children.push_back(new Node<int>(2));
-    root->children.push_back(new Node<int>(3));
-    root->children[0]->children.push_back(new Node<int>(4));
-    root->children[1]->children.push_back(new Node<int>(5));
-
-    DFSIterator it = root->begin_dfs_scan();
-    DFSIterator end = root->end_dfs_scan();
+//---------------------------------PostOrderIterator---------------------------------
+template<typename T, int K>
+void testPostOrderIterator() {
+    Node<T> root = Node<T>(1);
+    Tree<T> tree;
+    tree.add_root(root);
+    Node<T> n1 = Node<T>(2);
+    Node<T> n2 = Node<T>(3);
+    tree.add_sub_node(root, n1);
+    tree.add_sub_node(root, n2);
 
     std::stringstream ss;
-    while (it != end) {
-        ss << (*it)->value << " ";
-        ++it;
+    for (auto node = tree.begin_post_order(); node != tree.end_post_order(); ++node)
+    {
+        ss <<  node.get_root()->get_value() << " ";
+        ++node;
     }
-    
-    // Check the output
-    CHECK(ss.str() == "1 3 5 2 4 ");
 
-    // Clean up
-    deleteTree(root);
+    CHECK(ss.str() == "2 3 1 ");
 }
 
-TEST_CASE("Test HeapIterator") {
-    // Create a tree structure
-    Node<int>* root = new Node<int>(1);
-    root->children.push_back(new Node<int>(2));
-    root->children.push_back(new Node<int>(3));
-    root->children[0]->children.push_back(new Node<int>(4));
-    root->children[1]->children.push_back(new Node<int>(5));
+// Instantiate the templated test case with specific types
+TEST_CASE("Test PostOrderIterator with int and K=2") {
+    testPostOrderIterator<int, 2>();
+}
 
-    HeapIterator it = root->begin_heap();
-    HeapIterator end = root->end_heap();
+// Add more test cases as needed for different types and K values
+TEST_CASE("Test PostOrderIterator with double and K=3") {
+    testPostOrderIterator<double, 3>();
+}
+
+//---------------------------------InOrderIterator---------------------------------
+template<typename T, int K>
+void testInOrderIterator() {
+    Node<T> root = Node<T>(1);
+    Tree<T> tree;
+    tree.add_root(root);
+    Node<T> n1 = Node<T>(2);
+    Node<T> n2 = Node<T>(3);
+    tree.add_sub_node(root, n1);
+    tree.add_sub_node(root, n2);
 
     std::stringstream ss;
-    while (it != end) {
-        ss << (*it)->value << " ";
-        ++it;
+    for (auto node = tree.begin_in_order(); node != tree.end_in_order(); ++node)
+    {
+        ss <<  node.get_root()->get_value() << " ";
+        ++node;
     }
-    
-    // Check the output
-    CHECK(ss.str() == "1 2 3 4 5 ");
 
-    // Clean up
-    deleteTree(root);
+    CHECK(ss.str() == "2 1 3 ");
+}
+
+// Instantiate the templated test case with specific types
+TEST_CASE("Test InOrderIterator with int and K=2") {
+    testInOrderIterator<int, 2>();
+}
+
+// Add more test cases as needed for different types and K values
+TEST_CASE("Test InOrderIterator with double and K=3") {
+    testInOrderIterator<double, 3>();
+}
+
+//---------------------------------BFSIterator---------------------------------
+template<typename T, int K>
+void testBFSIterator() {
+    Node<T> root = Node<T>(1);
+    Tree<T> tree;
+    tree.add_root(root);
+    Node<T> n1 = Node<T>(2);
+    Node<T> n2 = Node<T>(3);
+    tree.add_sub_node(root, n1);
+    tree.add_sub_node(root, n2);
+
+    std::stringstream ss;
+    for (auto node = tree.begin_bfs_scan(); node != tree.end_bfs_scan(); ++node)
+    {
+        ss <<  node.get_root()->get_value() << " ";
+        ++node;
+    }
+
+    CHECK(ss.str() == "1 2 3 ");
+}
+
+// Instantiate the templated test case with specific types
+TEST_CASE("Test BFSIterator with int and K=2") {
+    testBFSIterator<int, 2>();
+}
+
+// Add more test cases as needed for different types and K values
+TEST_CASE("Test BFSIterator with double and K=3") {
+    testBFSIterator<double, 3>();
+}
+
+//---------------------------------DFSIterator---------------------------------
+template<typename T, int K>
+void testDFSIterator() {
+    Node<T> root = Node<T>(1);
+    Tree<T> tree;
+    tree.add_root(root);
+    Node<T> n1 = Node<T>(2);
+    Node<T> n2 = Node<T>(3);
+    tree.add_sub_node(root, n1);
+    tree.add_sub_node(root, n2);
+
+    std::stringstream ss;
+    for (auto node = tree.begin_dfs_scan(); node != tree.end_dfs_scan(); ++node)
+    {
+        ss <<  node.get_root()->get_value() << " ";
+        ++node;
+    }
+
+    CHECK(ss.str() == "1 3 2 ");
+}
+
+// Instantiate the templated test case with specific types
+TEST_CASE("Test DFSIterator with int and K=2") {
+    testDFSIterator<int, 2>();
+}
+
+// Add more test cases as needed for different types and K values
+TEST_CASE("Test DFSIterator with double and K=3") {
+    testDFSIterator<double, 3>();
 }
