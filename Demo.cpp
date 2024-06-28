@@ -10,6 +10,7 @@
 #include "tree.cpp"
 
 using namespace std;
+
 // Function to draw the tree using SFML
 template<typename T>
 void draw_tree(sf::RenderWindow& window, const Node<T>& node, float x, float y, float horizontal_spacing, float vertical_spacing)

@@ -1,7 +1,7 @@
 /*  ID: 212051007
     Mail: mayrozen45@gmail.com
 */
-
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <queue>
 #include <stack>
 #include <iostream>
@@ -24,8 +24,9 @@ private:
     }
 public:
     Node<T>* root;
+    size_t max_children;
 
-    Tree() : root(nullptr) {}
+    Tree(size_t k=2) : root(nullptr) ,max_children(k) {}
 
     ~Tree() {
         if (root != nullptr) {

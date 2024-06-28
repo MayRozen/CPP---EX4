@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <stack>
+#include <memory>
 
 // Container - Node
 template<typename T> 
@@ -21,7 +22,7 @@ public:
         children.clear();  // Clear the vector of children
     }
 
-    T get_value() const { // Generic
+    T get_value() const { // Generic get value function
         return value;
     }
 
