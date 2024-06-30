@@ -1,9 +1,11 @@
 /*  ID: 212051007
     Mail: mayrozen45@gmail.com
 */
+
 /**
  * Demo app for Ex4
  */
+
 #include <iostream>
 #include <string>
 #include <SFML/Graphics.hpp>
@@ -142,7 +144,7 @@ int main()
     cout << "Heap traversal:" << endl;
     for (auto node = tree.begin_heap(); node != tree.end_heap(); ++node) {
         cout << node->get_value() << endl;
-    }
+    } // prints: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6
     cout << "Heap traversal success!" << endl;
 
     // for (auto node : tree)
@@ -176,5 +178,6 @@ int main()
      */
     // Create SFML window
 
+    cout<<"Demo end!"<<endl;
     return 0;
 }

@@ -17,7 +17,7 @@ template<typename T, int K = 2>
 class Tree {
 private:
     void delete_subtree(Node<T>* node) {
-        if (node == nullptr) {
+        if (node == nullptr) { // If there is no subtree
             return;
         }
         for (Node<T>* child : node->children) {
@@ -27,9 +27,9 @@ private:
     }
 public:
     Node<T>* root;
-    size_t max_children;
+    size_t max_children; // -> K
 
-    Tree(size_t k=2) : root(nullptr) ,max_children(k) {}
+    Tree(size_t k=2) : root(nullptr) ,max_children(k) {} // Constructor
 
     void add_root(Node<T>& node) {
         root = &node; // Store the pointer to the node
@@ -66,16 +66,16 @@ public:
     public:
         PreOrderIterator(Node<T>* root) {
             if (root) {
-                stack.push(root);
+                stack.push(root); // The root of the tree is the first value in the stack
             }
         }
 
         Node<T>* operator->() const {
-            return stack.top();
+            return stack.top(); // The first POINTER in the stack
         }
 
         Node<T>& operator*() const {
-            return *stack.top();
+            return *stack.top(); // The first VALUE in the stack
         }
         
         PreOrderIterator& operator++() {
@@ -122,10 +122,10 @@ public:
         stack<Node<T>*> stack;
 
         void init(Node<T>* node){
-            if(node) {
+            if(node) { // If there is a node
                 stack.push(node);
-                for(auto it = node->children.rbegin(); it != node->children.rend(); ++it ){
-                    init(*it);
+                for(auto it = node->children.rbegin(); it != node->children.rend(); ++it ){ // Run over all its children
+                    init(*it); // Recrsive function
                 }
             }
         }
@@ -138,11 +138,11 @@ public:
             }
         }
 
-        Node<T>* get_root() const {
+        Node<T>* get_root() const { // Return the root of the tree
             return root;
         }
 
-        Node<T>& operator->() const {
+        Node<T>& operator->() const { // Return a refernce to the root of the tree
             return *root;
         }
 
@@ -151,7 +151,6 @@ public:
         }
         
         PostOrderIterator& operator++() {
-
             if (!stack.empty()) {
                 stack.pop(); // Removes this node from the stack because it's being processed
                 if (!stack.empty()) {
@@ -190,15 +189,11 @@ public:
                 pushLeft(root);
             }
 
-            bool operator!=(const InOrderIterator& other) const {
-                return !(*this == other);
+            Node<T>* operator->() const { // Return the first POINTER in the stack
+                return nodes.top();
             }
 
-            bool operator==(const InOrderIterator& other) const {
-                return nodes == other.nodes;
-            }
-
-            Node<T>& operator*() const {
+            Node<T>& operator*() const { // Return the reference to the first value in the stack
                 return *nodes.top();
             }
 
@@ -206,15 +201,19 @@ public:
                 if (!nodes.empty()) {
                     Node<T>* current = nodes.top();
                     nodes.pop();
-                    if (!current->children.empty()) {
-                        pushLeft(current->children[1]);
+                    if (!current->children.empty()) { // Run over all its children
+                        pushLeft(current->children[1]); // Put it at the "left side" of the root
                     }
                 }
                 return *this;
             }
 
-            Node<T>* operator->() const {
-                return nodes.top();
+            bool operator!=(const InOrderIterator& other) const {
+                return !(*this == other);
+            }
+
+            bool operator==(const InOrderIterator& other) const {
+                return nodes == other.nodes;
             }
 
         private:

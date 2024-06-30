@@ -5,7 +5,7 @@ CXX = clang++
 CXXFLAGS = -std=c++11 -Werror -Wsign-conversion -g
 VALGRIND_FLAGS = -v --leak-check=full --show-leak-kinds=all --error-exitcode=99
 
-SOURCES = node.cpp Complex.cpp TestCounter.cpp test.cpp
+SOURCES = node.cpp Complex.cpp TestCounter.cpp Test.cpp
 OBJECTS = $(SOURCES:.cpp=.o)
 
 # SFML libraries
