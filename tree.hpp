@@ -79,15 +79,28 @@ public:
         }
         
         PreOrderIterator& operator++() {
-            if (!stack.empty()) {
-                Node<T>* current = stack.top(); // The current node being processed in the traversal
-                stack.pop(); // Removes this node from the stack because it's being processed
+            if(K<=2){
+                if (!stack.empty()) {
+                    Node<T>* current = stack.top(); // The current node being processed in the traversal
+                    stack.pop(); // Removes this node from the stack because it's being processed
 
-                // Iterate over these children in reverse order (from last to first)
-                for (auto it = current->children.rbegin(); it != current->children.rend(); ++it) {
-                    stack.push(*it);
+                    // Iterate over these children in reverse order (from last to first)
+                    for (auto it = current->children.rbegin(); it != current->children.rend(); ++it) {
+                        stack.push(*it);
+                    }
+                }
+            } else{ // DFS
+                if (!stack.empty()) {
+                    Node<T>* current = stack.top();
+                    stack.pop();
+
+                    // Push children in reverse order (right to left) for DFS traversal
+                    for (auto it = current->children.rbegin(); it != current->children.rend(); ++it) {
+                        stack.push(*it);
+                    }
                 }
             }
+            
             return *this;
         }
                 
@@ -151,15 +164,27 @@ public:
         }
         
         PostOrderIterator& operator++() {
-            if (!stack.empty()) {
-                stack.pop(); // Removes this node from the stack because it's being processed
+            if(K<=2){
                 if (!stack.empty()) {
-                    root = stack.top();
+                    stack.pop(); // Removes this node from the stack because it's being processed
+                    if (!stack.empty()) {
+                        root = stack.top();
+                    } else {
+                        root = nullptr;
+                    }
                 } else {
                     root = nullptr;
                 }
-            } else {
-                root = nullptr;
+            } else{ // DFS
+                if (!stack.empty()) {
+                    Node<T>* current = stack.top();
+                    stack.pop();
+
+                    // Push children in reverse order (right to left) for DFS traversal
+                    for (auto it = current->children.rbegin(); it != current->children.rend(); ++it) {
+                        stack.push(*it);
+                    }
+                }
             }
 
             return *this;
@@ -184,20 +209,21 @@ public:
 
 //---------------------------------InOrderIterator---------------------------------
     class InOrderIterator {
-        public:
-            explicit InOrderIterator(Node<T>* root) {
-                pushLeft(root);
-            }
+    public:
+        explicit InOrderIterator(Node<T>* root) {
+            pushLeft(root);
+        }
 
-            Node<T>* operator->() const { // Return the first POINTER in the stack
-                return nodes.top();
-            }
+        Node<T>* operator->() const { // Return the first POINTER in the stack
+            return nodes.top();
+        }
 
-            Node<T>& operator*() const { // Return the reference to the first value in the stack
-                return *nodes.top();
-            }
+        Node<T>& operator*() const { // Return the reference to the first value in the stack
+            return *nodes.top();
+        }
 
-            InOrderIterator& operator++() {
+        InOrderIterator& operator++() {
+            if(K<=2){
                 if (!nodes.empty()) {
                     Node<T>* current = nodes.top();
                     nodes.pop();
@@ -205,31 +231,43 @@ public:
                         pushLeft(current->children[1]); // Put it at the "left side" of the root
                     }
                 }
-                return *this;
-            }
+            } else{ // DFS
+                if (!nodes.empty()) {
+                    Node<T>* current = nodes.top();
+                    nodes.pop();
 
-            bool operator!=(const InOrderIterator& other) const {
-                return !(*this == other);
-            }
-
-            bool operator==(const InOrderIterator& other) const {
-                return nodes == other.nodes;
-            }
-
-        private:
-            stack<Node<T>*> nodes;
-
-            void pushLeft(Node<T>* node) {
-                while (node) {
-                    nodes.push(node);
-                    if (!node->children.empty()) {
-                        node = node->children[0];
-                    }
-                    else {
-                        break;
+                    // Push children in reverse order (right to left) for DFS traversal
+                    for (auto it = current->children.rbegin(); it != current->children.rend(); ++it) {
+                        nodes.push(*it);
                     }
                 }
             }
+            
+            return *this;
+        }
+
+        bool operator!=(const InOrderIterator& other) const {
+            return !(*this == other);
+        }
+
+        bool operator==(const InOrderIterator& other) const {
+            return nodes == other.nodes;
+        }
+
+    private:
+        stack<Node<T>*> nodes;
+
+        void pushLeft(Node<T>* node) {
+            while (node) {
+                nodes.push(node);
+                if (!node->children.empty()) {
+                    node = node->children[0];
+                }
+                else {
+                    break;
+                }
+            }
+        }
     };
 
     InOrderIterator begin_in_order() const {
