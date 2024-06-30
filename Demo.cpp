@@ -13,52 +13,6 @@
 
 using namespace std;
 
-// Function to draw the tree using SFML
-template<typename T>
-void draw_tree(sf::RenderWindow& window, const Node<T>& node, float x, float y, float horizontal_spacing, float vertical_spacing)
-{
-    sf::CircleShape circle(30); // Circle shape for each node
-    circle.setFillColor(sf::Color::Blue); // Set node color
-
-    // Position the circle
-    circle.setPosition(x, y);
-    window.draw(circle);
-
-    // Draw text (node value)
-    sf::Font font;
-    if (!font.loadFromFile("path/to/arial.ttf")) { // Replace with actual path
-        std::cerr << "Failed to load font 'arial.ttf'!" << std::endl;
-        return;
-    }
-
-    sf::Text text(std::to_string(node.get_value()), font, 20);
-    text.setFillColor(sf::Color::White);
-    text.setStyle(sf::Text::Bold);
-    text.setPosition(x + 10, y + 5); // Adjusted to center the text inside the circle
-    window.draw(text);
-
-    // Calculate positions for child nodes
-    auto children = node.children;
-    int num_children = children.size();
-    float start_x = x - (num_children - 1) * horizontal_spacing / 2;
-
-    // Recursively draw child nodes
-    for (size_t i = 0; i < children.size(); ++i) {
-        float child_x = start_x + i * horizontal_spacing;
-        float child_y = y + vertical_spacing;
-
-        // Draw a line connecting the current node to the child node
-        sf::Vertex line[] =
-        {
-            sf::Vertex(sf::Vector2f(x + 30, y + 30)), // Start point (center of current node)
-            sf::Vertex(sf::Vector2f(child_x + 30, child_y)) // End point (center of child node)
-        };
-        window.draw(line, 2, sf::Lines);
-
-        draw_tree(window, *children[i], child_x, child_y, horizontal_spacing / 2, vertical_spacing);
-    }
-}
-
 int main()
 {
 
@@ -76,26 +30,6 @@ int main()
     tree.add_sub_node(n1, n3);
     tree.add_sub_node(n1, n4);
     tree.add_sub_node(n2, n5);
-    
-    // Create SFML window
-    sf::RenderWindow window(sf::VideoMode(800, 600), "SFML Tree Visualization");
-
-    // Main loop
-    while (window.isOpen()) {
-        sf::Event event;
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed) {
-                window.close();
-            }
-        }
-
-        window.clear(sf::Color::White);
-
-        // Draw the tree starting from the root node
-        draw_tree(window, root_node, 400, 50, 300, 100);
-
-        window.display();
-    }
    
     // The tree should look like:
     /**
@@ -147,12 +81,7 @@ int main()
     } // prints: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6
     cout << "Heap traversal success!" << endl;
 
-    // for (auto node : tree)
-    // {
-    //     cout << node->get_value() << endl;
-    // } // same as BFS: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6
-
-    // cout << tree; // Should print the graph using GUI.
+    tree.draw(); // Should print the graph using GUI.
     Tree<double,3> three_ary_tree; // 3-ary tree.
     three_ary_tree.add_root(root_node);
     three_ary_tree.add_sub_node(root_node, n1);
@@ -166,8 +95,6 @@ int main()
     three_ary_tree.add_sub_node(n2, n5);
     cout<<"n2 child"<<endl;
 
-    // cout << tree; // Should print the graph using GUI.
-
     // The tree should look like:
     /**
      *       root = 1.1
@@ -176,7 +103,6 @@ int main()
      *   /        |
      *  1.5      1.6
      */
-    // Create SFML window
 
     cout<<"Demo end!"<<endl;
     return 0;

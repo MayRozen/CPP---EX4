@@ -19,7 +19,7 @@ demo: Demo.o $(filter-out TestCounter.o Test.o, $(OBJECTS))
 	$(CXX) $(CXXFLAGS) -v $^ $(SFML_LIBS) -o demo
 
 test: TestCounter.o Test.o $(filter-out Demo.o, $(OBJECTS))
-	$(CXX) $(CXXFLAGS) -v $^ -o test
+	$(CXX) $(CXXFLAGS) -v $^ $(SFML_LIBS) -o test  # Add SFML_LIBS here
 
 tidy:
 	clang-tidy $(SOURCES) -checks=bugprone-,clang-analyzer-,cppcoreguidelines-,performance-,portability-,readability-,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-owning-memory --warnings-as-errors=-* --

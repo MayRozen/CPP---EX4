@@ -5,6 +5,7 @@
 #ifndef TREE_HPP
 #define TREE_HPP
 
+#include <SFML/Graphics.hpp>
 #include <queue>
 #include <stack>
 #include <iostream>
@@ -16,6 +17,39 @@ using namespace std;
 template<typename T, int K = 2>
 class Tree {
 private:
+    sf::Font font;
+
+    void drawNode(sf::RenderWindow& window, Node<T>* node, sf::Vector2f position, float xOffset, float yOffset) {
+        if (node == nullptr) return;
+
+        sf::CircleShape circle(20);
+        circle.setFillColor(sf::Color::Green);
+        circle.setPosition(position);
+        window.draw(circle);
+
+        sf::Text text;
+        text.setFont(font);
+        text.setString(std::to_string(node->value));
+        text.setCharacterSize(15);
+        text.setFillColor(sf::Color::White);
+        text.setPosition(position.x + 10, position.y + 5);
+        window.draw(text);
+
+        float childXOffset = xOffset / K;
+        float childYOffset = yOffset;
+
+        for (size_t i = 0; i < node->children.size(); ++i) {
+            sf::Vector2f childPosition(position.x + (i - (node->children.size() - 1) / 2.0f) * childXOffset, position.y + childYOffset);
+
+            sf::Vertex line[] = {
+                sf::Vertex(sf::Vector2f(position.x + 20, position.y + 20)),
+                sf::Vertex(sf::Vector2f(childPosition.x + 20, childPosition.y + 20))};
+            window.draw(line, 2, sf::Lines);
+
+            drawNode(window, node->children[i], childPosition, childXOffset, childYOffset);
+        }
+    }
+
     void delete_subtree(Node<T>* node) {
         if (node == nullptr) { // If there is no subtree
             return;
@@ -31,6 +65,7 @@ public:
 
     Tree(size_t k=2) : root(nullptr) ,max_children(k) {} // Constructor
 
+    ~Tree(){}
     void add_root(Node<T>& node) {
         root = &node; // Store the pointer to the node
     }
@@ -43,20 +78,20 @@ public:
         }
     }
 
-    // Overload the output stream operator to print the tree
-    ostream& operator<<(ostream& os) {
-        if (root == nullptr) return os;
-        queue<Node<T>*> q;
-        q.push(root);
-        while (!q.empty()) {
-            Node<T>* node = q.front();
-            q.pop();
-            os << node->get_value() << " ";
-            for (auto& child : node->children) {
-                q.push(child);
+    void draw() {
+        sf::RenderWindow window(sf::VideoMode(800, 600), "Tree Visualization");
+
+        while (window.isOpen()) {
+            sf::Event event;
+            while (window.pollEvent(event)) {
+                if (event.type == sf::Event::Closed)
+                    window.close();
             }
+
+            window.clear();
+            drawNode(window, root, sf::Vector2f(400, 50), 200, 100);
+            window.display();
         }
-        return os;
     }
 
 //---------------------------------PreOrderIterator---------------------------------
