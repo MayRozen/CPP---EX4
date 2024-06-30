@@ -61,6 +61,7 @@ template<typename T, int K = 2>
 # Compilation
 פקודות קומפילציה: 
 * make
+  
 פקודות הרצה:
 * ./demo
 * ./test
