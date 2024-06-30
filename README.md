@@ -59,7 +59,8 @@ template<typename T, int K = 2>
 על מנת לצייר את העץ השתמשתי בsfml הממומשת בתוך מחלקת Tree ונקראת על ידי tree.drow().
 
 # Compilation
-פקודות קומפילציה: make
+פקודות קומפילציה: 
+* make
 פקודות הרצה:
 * ./demo
 * ./test
