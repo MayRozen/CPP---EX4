@@ -3,7 +3,7 @@
 // */
 
 // #include "doctest.h"
-// #include "tree.cpp"
+// #include "tree.hpp"
 // #include <sstream>
 // #include <string>
 
@@ -64,7 +64,6 @@
 //     for (auto node = tree.begin_pre_order(); node != tree.end_pre_order(); ++node)
 //     {
 //         ss <<  to_string(node->get_value()) << " ";
-//         ++node;
 //     }
 
 //     CHECK(ss.str() == "1 2 3 ");
@@ -95,7 +94,6 @@
 //     for (auto node = tree.begin_post_order(); node != tree.end_post_order(); ++node)
 //     {
 //         ss <<  to_string(node.get_root()->get_value()) << " ";
-//         ++node;
 //     }
 
 //     CHECK(ss.str() == "2 3 1 ");
@@ -126,7 +124,6 @@
 //     for (auto node = tree.begin_in_order(); node != tree.end_in_order(); ++node)
 //     {
 //         ss <<  to_string(node->get_value()) << " ";
-//         ++node;
 //     }
 
 //     CHECK(ss.str() == "2 1 3 ");
@@ -157,7 +154,6 @@
 //     for (auto node = tree.begin_bfs_scan(); node != tree.end_bfs_scan(); ++node)
 //     {
 //         ss <<  to_string(node->get_value()) << " ";
-//         ++node;
 //     }
 
 //     CHECK(ss.str() == "1 2 3 ");
@@ -188,7 +184,6 @@
 //     for (auto node = tree.begin_dfs_scan(); node != tree.end_dfs_scan(); ++node)
 //     {
 //         ss <<  to_string(node->get_value()) << " ";
-//         ++node;
 //     }
 
 //     CHECK(ss.str() == "1 3 2 ");

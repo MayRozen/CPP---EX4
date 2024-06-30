@@ -7,7 +7,7 @@
 #include <iostream>
 #include <string>
 #include <SFML/Graphics.hpp>
-#include "tree.cpp"
+#include "tree.hpp"
 
 using namespace std;
 
@@ -139,12 +139,11 @@ int main()
     } // prints: 1.1 1.2 1.4 1.5 1.3 1.6
     cout<<"dfs_scan success!"<<endl;
 
-    // cout << "Heap traversal:" << endl;
-    // for (auto it = tree.begin_heap(); it != tree.end_heap(); ++it) {
-    //     cout << it->get_value() << " ";
-    // }
-    // cout << "Heap traversal success!" << endl;
-
+    cout << "Heap traversal:" << endl;
+    for (auto node = tree.begin_heap(); node != tree.end_heap(); ++node) {
+        cout << node->get_value() << endl;
+    }
+    cout << "Heap traversal success!" << endl;
 
     // for (auto node : tree)
     // {
@@ -165,7 +164,9 @@ int main()
     three_ary_tree.add_sub_node(n2, n5);
     cout<<"n2 child"<<endl;
 
-     // The tree should look like:
+    // cout << tree; // Should print the graph using GUI.
+
+    // The tree should look like:
     /**
      *       root = 1.1
      *     /      |     \

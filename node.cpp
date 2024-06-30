@@ -15,13 +15,6 @@ public:
 
     Node(T val) : value(val) {} // constructor
 
-    ~Node() {
-        for (Node<T>* child : children) {
-            delete child; // Recursively delete child nodes
-        }
-        children.clear();  // Clear the vector of children
-    }
-
     T get_value() const { // Generic get value function
         return value;
     }

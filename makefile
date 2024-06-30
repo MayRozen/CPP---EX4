@@ -5,7 +5,7 @@ CXX = clang++
 CXXFLAGS = -std=c++11 -Werror -Wsign-conversion -g
 VALGRIND_FLAGS = -v --leak-check=full --show-leak-kinds=all --error-exitcode=99
 
-SOURCES = node.cpp tree.cpp Complex.cpp TestCounter.cpp test.cpp
+SOURCES = node.cpp Complex.cpp TestCounter.cpp test.cpp
 OBJECTS = $(SOURCES:.cpp=.o)
 
 # SFML libraries
@@ -28,7 +28,7 @@ valgrind: demo test
 	valgrind --tool=memcheck $(VALGRIND_FLAGS) ./demo 2>&1 | { egrep "lost| at " || true; }
 	valgrind --tool=memcheck $(VALGRIND_FLAGS) ./test 2>&1 | { egrep "lost| at " || true; }
 
-%.o: %.cpp
+%.o: %.cpp tree.hpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 clean:
