@@ -13,12 +13,13 @@ ID: 212051007 Mail: mayrozen45@gmail.com
 מחלקה זו מהווה את העץ עצמו. המחלקה מורכבת משורש מסוג מצביע לNode וכמות מקסימלית של ילדים המוגדרת על ידי K שמוגדר בעזרת template. במידה ולא מוכנס ערך אחר K מוגדר להיות 2 כנדרש:
 template<typename T, int K = 2>
 כמו כן, מחלקה זו מכילה בתוכה את כלל האופרטורים שניתן לבצע על העץ כאשר כל אחד מן האופרטורים מהווה class בפני עצמו שמכילה את הפעולות שעושה האופרטור:
-class PreOrderIterator
-class PostOrderIterator
-class InOrderIterator
-class BFSIterator
-class DFSIterator
-class HeapIterator
+        
+        class PreOrderIterator
+        class PostOrderIterator
+        class InOrderIterator
+        class BFSIterator
+        class DFSIterator
+        class HeapIterator
 
 כעת אפרט על כל אחד מהאופרטורים:
 
